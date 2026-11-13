@@ -1,0 +1,1572 @@
+{
+  "_type": "Project",
+  "_id": "proj_cinetrack_v2",
+  "name": "CineTrack_V2",
+  "ownedElements": [
+    {
+      "_type": "UMLModel",
+      "_id": "model_cinetrack",
+      "_parent": {
+        "$ref": "proj_cinetrack_v2"
+      },
+      "name": "CineTrack_V2_Modele_UML",
+      "ownedElements": [
+        {
+          "_type": "UMLPackage",
+          "_id": "pkg_usecase",
+          "_parent": {
+            "$ref": "model_cinetrack"
+          },
+          "name": "1_Cas_Utilisation",
+          "ownedElements": [
+            {
+              "_type": "UMLUseCaseDiagram",
+              "_id": "diag_usecase",
+              "_parent": {
+                "$ref": "pkg_usecase"
+              },
+              "name": "Diagramme_Cas_Utilisation_CineTrack",
+              "ownedViews": []
+            },
+            {
+              "_type": "UMLActor",
+              "_id": "act_caissier",
+              "_parent": {
+                "$ref": "pkg_usecase"
+              },
+              "name": "Caissier",
+              "ownedElements": [
+                {
+                  "_type": "UMLAssociation",
+                  "_id": "assoc_uc_1",
+                  "_parent": {
+                    "$ref": "act_caissier"
+                  },
+                  "end1": {
+                    "_type": "UMLAssociationEnd",
+                    "_id": "assoc_uc_1_e1",
+                    "_parent": {
+                      "$ref": "assoc_uc_1"
+                    },
+                    "reference": {
+                      "$ref": "act_caissier"
+                    }
+                  },
+                  "end2": {
+                    "_type": "UMLAssociationEnd",
+                    "_id": "assoc_uc_1_e2",
+                    "_parent": {
+                      "$ref": "assoc_uc_1"
+                    },
+                    "reference": {
+                      "$ref": "uc_clients"
+                    }
+                  }
+                },
+                {
+                  "_type": "UMLAssociation",
+                  "_id": "assoc_uc_2",
+                  "_parent": {
+                    "$ref": "act_caissier"
+                  },
+                  "end1": {
+                    "_type": "UMLAssociationEnd",
+                    "_id": "assoc_uc_2_e1",
+                    "_parent": {
+                      "$ref": "assoc_uc_2"
+                    },
+                    "reference": {
+                      "$ref": "act_caissier"
+                    }
+                  },
+                  "end2": {
+                    "_type": "UMLAssociationEnd",
+                    "_id": "assoc_uc_2_e2",
+                    "_parent": {
+                      "$ref": "assoc_uc_2"
+                    },
+                    "reference": {
+                      "$ref": "uc_billetterie"
+                    }
+                  }
+                },
+                {
+                  "_type": "UMLAssociation",
+                  "_id": "assoc_uc_3",
+                  "_parent": {
+                    "$ref": "act_caissier"
+                  },
+                  "end1": {
+                    "_type": "UMLAssociationEnd",
+                    "_id": "assoc_uc_3_e1",
+                    "_parent": {
+                      "$ref": "assoc_uc_3"
+                    },
+                    "reference": {
+                      "$ref": "act_caissier"
+                    }
+                  },
+                  "end2": {
+                    "_type": "UMLAssociationEnd",
+                    "_id": "assoc_uc_3_e2",
+                    "_parent": {
+                      "$ref": "assoc_uc_3"
+                    },
+                    "reference": {
+                      "$ref": "uc_avis"
+                    }
+                  }
+                },
+                {
+                  "_type": "UMLAssociation",
+                  "_id": "assoc_uc_4",
+                  "_parent": {
+                    "$ref": "act_caissier"
+                  },
+                  "end1": {
+                    "_type": "UMLAssociationEnd",
+                    "_id": "assoc_uc_4_e1",
+                    "_parent": {
+                      "$ref": "assoc_uc_4"
+                    },
+                    "reference": {
+                      "$ref": "act_caissier"
+                    }
+                  },
+                  "end2": {
+                    "_type": "UMLAssociationEnd",
+                    "_id": "assoc_uc_4_e2",
+                    "_parent": {
+                      "$ref": "assoc_uc_4"
+                    },
+                    "reference": {
+                      "$ref": "uc_planning"
+                    }
+                  }
+                },
+                {
+                  "_type": "UMLAssociation",
+                  "_id": "assoc_uc_5",
+                  "_parent": {
+                    "$ref": "act_caissier"
+                  },
+                  "end1": {
+                    "_type": "UMLAssociationEnd",
+                    "_id": "assoc_uc_5_e1",
+                    "_parent": {
+                      "$ref": "assoc_uc_5"
+                    },
+                    "reference": {
+                      "$ref": "act_caissier"
+                    }
+                  },
+                  "end2": {
+                    "_type": "UMLAssociationEnd",
+                    "_id": "assoc_uc_5_e2",
+                    "_parent": {
+                      "$ref": "assoc_uc_5"
+                    },
+                    "reference": {
+                      "$ref": "uc_ajout_modif_film_salle"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "_type": "UMLActor",
+              "_id": "act_admin",
+              "_parent": {
+                "$ref": "pkg_usecase"
+              },
+              "name": "Administrateur",
+              "ownedElements": [
+                {
+                  "_type": "UMLGeneralization",
+                  "_id": "gen_admin_caissier",
+                  "_parent": {
+                    "$ref": "act_admin"
+                  },
+                  "source": {
+                    "$ref": "act_admin"
+                  },
+                  "target": {
+                    "$ref": "act_caissier"
+                  }
+                },
+                {
+                  "_type": "UMLAssociation",
+                  "_id": "assoc_uc_6",
+                  "_parent": {
+                    "$ref": "act_admin"
+                  },
+                  "end1": {
+                    "_type": "UMLAssociationEnd",
+                    "_id": "assoc_uc_6_e1",
+                    "_parent": {
+                      "$ref": "assoc_uc_6"
+                    },
+                    "reference": {
+                      "$ref": "act_admin"
+                    }
+                  },
+                  "end2": {
+                    "_type": "UMLAssociationEnd",
+                    "_id": "assoc_uc_6_e2",
+                    "_parent": {
+                      "$ref": "assoc_uc_6"
+                    },
+                    "reference": {
+                      "$ref": "uc_suppr_film_salle"
+                    }
+                  }
+                },
+                {
+                  "_type": "UMLAssociation",
+                  "_id": "assoc_uc_7",
+                  "_parent": {
+                    "$ref": "act_admin"
+                  },
+                  "end1": {
+                    "_type": "UMLAssociationEnd",
+                    "_id": "assoc_uc_7_e1",
+                    "_parent": {
+                      "$ref": "assoc_uc_7"
+                    },
+                    "reference": {
+                      "$ref": "act_admin"
+                    }
+                  },
+                  "end2": {
+                    "_type": "UMLAssociationEnd",
+                    "_id": "assoc_uc_7_e2",
+                    "_parent": {
+                      "$ref": "assoc_uc_7"
+                    },
+                    "reference": {
+                      "$ref": "uc_prog_seance"
+                    }
+                  }
+                },
+                {
+                  "_type": "UMLAssociation",
+                  "_id": "assoc_uc_8",
+                  "_parent": {
+                    "$ref": "act_admin"
+                  },
+                  "end1": {
+                    "_type": "UMLAssociationEnd",
+                    "_id": "assoc_uc_8_e1",
+                    "_parent": {
+                      "$ref": "assoc_uc_8"
+                    },
+                    "reference": {
+                      "$ref": "act_admin"
+                    }
+                  },
+                  "end2": {
+                    "_type": "UMLAssociationEnd",
+                    "_id": "assoc_uc_8_e2",
+                    "_parent": {
+                      "$ref": "assoc_uc_8"
+                    },
+                    "reference": {
+                      "$ref": "uc_tarifs_users"
+                    }
+                  }
+                },
+                {
+                  "_type": "UMLAssociation",
+                  "_id": "assoc_uc_9",
+                  "_parent": {
+                    "$ref": "act_admin"
+                  },
+                  "end1": {
+                    "_type": "UMLAssociationEnd",
+                    "_id": "assoc_uc_9_e1",
+                    "_parent": {
+                      "$ref": "assoc_uc_9"
+                    },
+                    "reference": {
+                      "$ref": "act_admin"
+                    }
+                  },
+                  "end2": {
+                    "_type": "UMLAssociationEnd",
+                    "_id": "assoc_uc_9_e2",
+                    "_parent": {
+                      "$ref": "assoc_uc_9"
+                    },
+                    "reference": {
+                      "$ref": "uc_stats"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "_type": "UMLUseCase",
+              "_id": "uc_auth",
+              "_parent": {
+                "$ref": "pkg_usecase"
+              },
+              "name": "S'authentifier"
+            },
+            {
+              "_type": "UMLUseCase",
+              "_id": "uc_clients",
+              "_parent": {
+                "$ref": "pkg_usecase"
+              },
+              "name": "Gérer les clients (créer, consulter)",
+              "ownedElements": [
+                {
+                  "_type": "UMLInclude",
+                  "_id": "inc_auth_1",
+                  "_parent": {
+                    "$ref": "uc_clients"
+                  },
+                  "source": {
+                    "$ref": "uc_clients"
+                  },
+                  "target": {
+                    "$ref": "uc_auth"
+                  }
+                }
+              ]
+            },
+            {
+              "_type": "UMLUseCase",
+              "_id": "uc_verif_dispo_tarif",
+              "_parent": {
+                "$ref": "pkg_usecase"
+              },
+              "name": "Vérifier disponibilité et calculer tarif"
+            },
+            {
+              "_type": "UMLUseCase",
+              "_id": "uc_billetterie",
+              "_parent": {
+                "$ref": "pkg_usecase"
+              },
+              "name": "Gérer la billetterie (réserver, annuler)",
+              "ownedElements": [
+                {
+                  "_type": "UMLInclude",
+                  "_id": "inc_dispo",
+                  "_parent": {
+                    "$ref": "uc_billetterie"
+                  },
+                  "source": {
+                    "$ref": "uc_billetterie"
+                  },
+                  "target": {
+                    "$ref": "uc_verif_dispo_tarif"
+                  }
+                },
+                {
+                  "_type": "UMLInclude",
+                  "_id": "inc_auth_2",
+                  "_parent": {
+                    "$ref": "uc_billetterie"
+                  },
+                  "source": {
+                    "$ref": "uc_billetterie"
+                  },
+                  "target": {
+                    "$ref": "uc_auth"
+                  }
+                }
+              ]
+            },
+            {
+              "_type": "UMLUseCase",
+              "_id": "uc_avis",
+              "_parent": {
+                "$ref": "pkg_usecase"
+              },
+              "name": "Enregistrer un avis et une note client"
+            },
+            {
+              "_type": "UMLUseCase",
+              "_id": "uc_planning",
+              "_parent": {
+                "$ref": "pkg_usecase"
+              },
+              "name": "Consulter le planning et rechercher"
+            },
+            {
+              "_type": "UMLUseCase",
+              "_id": "uc_ajout_modif_film_salle",
+              "_parent": {
+                "$ref": "pkg_usecase"
+              },
+              "name": "Ajouter / Modifier un film ou une salle"
+            },
+            {
+              "_type": "UMLUseCase",
+              "_id": "uc_suppr_film_salle",
+              "_parent": {
+                "$ref": "pkg_usecase"
+              },
+              "name": "Supprimer un film ou une salle",
+              "ownedElements": [
+                {
+                  "_type": "UMLInclude",
+                  "_id": "inc_auth_3",
+                  "_parent": {
+                    "$ref": "uc_suppr_film_salle"
+                  },
+                  "source": {
+                    "$ref": "uc_suppr_film_salle"
+                  },
+                  "target": {
+                    "$ref": "uc_auth"
+                  }
+                }
+              ]
+            },
+            {
+              "_type": "UMLUseCase",
+              "_id": "uc_conflit",
+              "_parent": {
+                "$ref": "pkg_usecase"
+              },
+              "name": "Détecter les conflits horaires"
+            },
+            {
+              "_type": "UMLUseCase",
+              "_id": "uc_prog_seance",
+              "_parent": {
+                "$ref": "pkg_usecase"
+              },
+              "name": "Programmer une séance",
+              "ownedElements": [
+                {
+                  "_type": "UMLInclude",
+                  "_id": "inc_conflit",
+                  "_parent": {
+                    "$ref": "uc_prog_seance"
+                  },
+                  "source": {
+                    "$ref": "uc_prog_seance"
+                  },
+                  "target": {
+                    "$ref": "uc_conflit"
+                  }
+                },
+                {
+                  "_type": "UMLInclude",
+                  "_id": "inc_auth_4",
+                  "_parent": {
+                    "$ref": "uc_prog_seance"
+                  },
+                  "source": {
+                    "$ref": "uc_prog_seance"
+                  },
+                  "target": {
+                    "$ref": "uc_auth"
+                  }
+                }
+              ]
+            },
+            {
+              "_type": "UMLUseCase",
+              "_id": "uc_tarifs_users",
+              "_parent": {
+                "$ref": "pkg_usecase"
+              },
+              "name": "Gérer les tarifs et les comptes utilisateurs"
+            },
+            {
+              "_type": "UMLUseCase",
+              "_id": "uc_stats",
+              "_parent": {
+                "$ref": "pkg_usecase"
+              },
+              "name": "Consulter et exporter les statistiques (PDF/CSV)"
+            }
+          ]
+        },
+        {
+          "_type": "UMLPackage",
+          "_id": "pkg_classes",
+          "_parent": {
+            "$ref": "model_cinetrack"
+          },
+          "name": "2_Diagramme_Classes",
+          "ownedElements": [
+            {
+              "_type": "UMLClassDiagram",
+              "_id": "diag_classes",
+              "_parent": {
+                "$ref": "pkg_classes"
+              },
+              "name": "Diagramme_Classes_CineTrack",
+              "ownedViews": []
+            },
+            {
+              "_type": "UMLClass",
+              "_id": "cls_utilisateur",
+              "_parent": {
+                "$ref": "pkg_classes"
+              },
+              "name": "Utilisateur",
+              "attributes": [
+                {
+                  "_type": "UMLAttribute",
+                  "_id": "attr_u1",
+                  "_parent": {
+                    "$ref": "cls_utilisateur"
+                  },
+                  "name": "idUtilisateur",
+                  "visibility": "private",
+                  "type": "int"
+                },
+                {
+                  "_type": "UMLAttribute",
+                  "_id": "attr_u2",
+                  "_parent": {
+                    "$ref": "cls_utilisateur"
+                  },
+                  "name": "identifiant",
+                  "visibility": "private",
+                  "type": "String"
+                },
+                {
+                  "_type": "UMLAttribute",
+                  "_id": "attr_u3",
+                  "_parent": {
+                    "$ref": "cls_utilisateur"
+                  },
+                  "name": "motDePasseHash",
+                  "visibility": "private",
+                  "type": "String"
+                },
+                {
+                  "_type": "UMLAttribute",
+                  "_id": "attr_u4",
+                  "_parent": {
+                    "$ref": "cls_utilisateur"
+                  },
+                  "name": "nom",
+                  "visibility": "private",
+                  "type": "String"
+                },
+                {
+                  "_type": "UMLAttribute",
+                  "_id": "attr_u5",
+                  "_parent": {
+                    "$ref": "cls_utilisateur"
+                  },
+                  "name": "prenom",
+                  "visibility": "private",
+                  "type": "String"
+                },
+                {
+                  "_type": "UMLAttribute",
+                  "_id": "attr_u6",
+                  "_parent": {
+                    "$ref": "cls_utilisateur"
+                  },
+                  "name": "role",
+                  "visibility": "private",
+                  "type": "String"
+                },
+                {
+                  "_type": "UMLAttribute",
+                  "_id": "attr_u7",
+                  "_parent": {
+                    "$ref": "cls_utilisateur"
+                  },
+                  "name": "tentativesEchouees",
+                  "visibility": "private",
+                  "type": "int"
+                },
+                {
+                  "_type": "UMLAttribute",
+                  "_id": "attr_u8",
+                  "_parent": {
+                    "$ref": "cls_utilisateur"
+                  },
+                  "name": "compteBloque",
+                  "visibility": "private",
+                  "type": "boolean"
+                }
+              ],
+              "operations": [
+                {
+                  "_type": "UMLOperation",
+                  "_id": "op_u1",
+                  "_parent": {
+                    "$ref": "cls_utilisateur"
+                  },
+                  "name": "verifierMotDePasse",
+                  "visibility": "public"
+                },
+                {
+                  "_type": "UMLOperation",
+                  "_id": "op_u2",
+                  "_parent": {
+                    "$ref": "cls_utilisateur"
+                  },
+                  "name": "incrementerTentatives",
+                  "visibility": "public"
+                }
+              ],
+              "ownedElements": [
+                {
+                  "_type": "UMLAssociation",
+                  "_id": "assoc_user_res",
+                  "_parent": {
+                    "$ref": "cls_utilisateur"
+                  },
+                  "name": "enregistre",
+                  "end1": {
+                    "_type": "UMLAssociationEnd",
+                    "_id": "ae_ur1",
+                    "_parent": {
+                      "$ref": "assoc_user_res"
+                    },
+                    "reference": {
+                      "$ref": "cls_utilisateur"
+                    },
+                    "multiplicity": "1"
+                  },
+                  "end2": {
+                    "_type": "UMLAssociationEnd",
+                    "_id": "ae_ur2",
+                    "_parent": {
+                      "$ref": "assoc_user_res"
+                    },
+                    "reference": {
+                      "$ref": "cls_reservation"
+                    },
+                    "multiplicity": "0..*"
+                  }
+                },
+                {
+                  "_type": "UMLAssociation",
+                  "_id": "assoc_user_log",
+                  "_parent": {
+                    "$ref": "cls_utilisateur"
+                  },
+                  "name": "genere",
+                  "end1": {
+                    "_type": "UMLAssociationEnd",
+                    "_id": "ae_ul1",
+                    "_parent": {
+                      "$ref": "assoc_user_log"
+                    },
+                    "reference": {
+                      "$ref": "cls_utilisateur"
+                    },
+                    "multiplicity": "1"
+                  },
+                  "end2": {
+                    "_type": "UMLAssociationEnd",
+                    "_id": "ae_ul2",
+                    "_parent": {
+                      "$ref": "assoc_user_log"
+                    },
+                    "reference": {
+                      "$ref": "cls_log"
+                    },
+                    "multiplicity": "0..*"
+                  }
+                }
+              ]
+            },
+            {
+              "_type": "UMLClass",
+              "_id": "cls_film",
+              "_parent": {
+                "$ref": "pkg_classes"
+              },
+              "name": "Film",
+              "attributes": [
+                {
+                  "_type": "UMLAttribute",
+                  "_id": "attr_f1",
+                  "_parent": {
+                    "$ref": "cls_film"
+                  },
+                  "name": "idFilm",
+                  "visibility": "private",
+                  "type": "int"
+                },
+                {
+                  "_type": "UMLAttribute",
+                  "_id": "attr_f2",
+                  "_parent": {
+                    "$ref": "cls_film"
+                  },
+                  "name": "titre",
+                  "visibility": "private",
+                  "type": "String"
+                },
+                {
+                  "_type": "UMLAttribute",
+                  "_id": "attr_f3",
+                  "_parent": {
+                    "$ref": "cls_film"
+                  },
+                  "name": "dureeMinutes",
+                  "visibility": "private",
+                  "type": "int"
+                },
+                {
+                  "_type": "UMLAttribute",
+                  "_id": "attr_f4",
+                  "_parent": {
+                    "$ref": "cls_film"
+                  },
+                  "name": "genre",
+                  "visibility": "private",
+                  "type": "String"
+                },
+                {
+                  "_type": "UMLAttribute",
+                  "_id": "attr_f5",
+                  "_parent": {
+                    "$ref": "cls_film"
+                  },
+                  "name": "synopsis",
+                  "visibility": "private",
+                  "type": "String"
+                },
+                {
+                  "_type": "UMLAttribute",
+                  "_id": "attr_f6",
+                  "_parent": {
+                    "$ref": "cls_film"
+                  },
+                  "name": "noteMoyenne",
+                  "visibility": "private",
+                  "type": "double"
+                }
+              ],
+              "operations": [
+                {
+                  "_type": "UMLOperation",
+                  "_id": "op_f1",
+                  "_parent": {
+                    "$ref": "cls_film"
+                  },
+                  "name": "calculerNoteMoyenne",
+                  "visibility": "public"
+                }
+              ],
+              "ownedElements": [
+                {
+                  "_type": "UMLAssociation",
+                  "_id": "assoc_film_seance",
+                  "_parent": {
+                    "$ref": "cls_film"
+                  },
+                  "name": "est_programme",
+                  "end1": {
+                    "_type": "UMLAssociationEnd",
+                    "_id": "ae_fs1",
+                    "_parent": {
+                      "$ref": "assoc_film_seance"
+                    },
+                    "reference": {
+                      "$ref": "cls_film"
+                    },
+                    "multiplicity": "1"
+                  },
+                  "end2": {
+                    "_type": "UMLAssociationEnd",
+                    "_id": "ae_fs2",
+                    "_parent": {
+                      "$ref": "assoc_film_seance"
+                    },
+                    "reference": {
+                      "$ref": "cls_seance"
+                    },
+                    "multiplicity": "0..*"
+                  }
+                },
+                {
+                  "_type": "UMLAssociation",
+                  "_id": "assoc_film_avis",
+                  "_parent": {
+                    "$ref": "cls_film"
+                  },
+                  "name": "recoit",
+                  "end1": {
+                    "_type": "UMLAssociationEnd",
+                    "_id": "ae_fa1",
+                    "_parent": {
+                      "$ref": "assoc_film_avis"
+                    },
+                    "reference": {
+                      "$ref": "cls_film"
+                    },
+                    "multiplicity": "1"
+                  },
+                  "end2": {
+                    "_type": "UMLAssociationEnd",
+                    "_id": "ae_fa2",
+                    "_parent": {
+                      "$ref": "assoc_film_avis"
+                    },
+                    "reference": {
+                      "$ref": "cls_avis"
+                    },
+                    "multiplicity": "0..*"
+                  }
+                }
+              ]
+            },
+            {
+              "_type": "UMLClass",
+              "_id": "cls_salle",
+              "_parent": {
+                "$ref": "pkg_classes"
+              },
+              "name": "Salle",
+              "attributes": [
+                {
+                  "_type": "UMLAttribute",
+                  "_id": "attr_sa1",
+                  "_parent": {
+                    "$ref": "cls_salle"
+                  },
+                  "name": "idSalle",
+                  "visibility": "private",
+                  "type": "int"
+                },
+                {
+                  "_type": "UMLAttribute",
+                  "_id": "attr_sa2",
+                  "_parent": {
+                    "$ref": "cls_salle"
+                  },
+                  "name": "nomSalle",
+                  "visibility": "private",
+                  "type": "String"
+                },
+                {
+                  "_type": "UMLAttribute",
+                  "_id": "attr_sa3",
+                  "_parent": {
+                    "$ref": "cls_salle"
+                  },
+                  "name": "capacite",
+                  "visibility": "private",
+                  "type": "int"
+                }
+              ],
+              "ownedElements": [
+                {
+                  "_type": "UMLAssociation",
+                  "_id": "assoc_salle_seance",
+                  "_parent": {
+                    "$ref": "cls_salle"
+                  },
+                  "name": "accueille",
+                  "end1": {
+                    "_type": "UMLAssociationEnd",
+                    "_id": "ae_ss1",
+                    "_parent": {
+                      "$ref": "assoc_salle_seance"
+                    },
+                    "reference": {
+                      "$ref": "cls_salle"
+                    },
+                    "multiplicity": "1"
+                  },
+                  "end2": {
+                    "_type": "UMLAssociationEnd",
+                    "_id": "ae_ss2",
+                    "_parent": {
+                      "$ref": "assoc_salle_seance"
+                    },
+                    "reference": {
+                      "$ref": "cls_seance"
+                    },
+                    "multiplicity": "0..*"
+                  }
+                }
+              ]
+            },
+            {
+              "_type": "UMLClass",
+              "_id": "cls_seance",
+              "_parent": {
+                "$ref": "pkg_classes"
+              },
+              "name": "Seance",
+              "attributes": [
+                {
+                  "_type": "UMLAttribute",
+                  "_id": "attr_se1",
+                  "_parent": {
+                    "$ref": "cls_seance"
+                  },
+                  "name": "idSeance",
+                  "visibility": "private",
+                  "type": "int"
+                },
+                {
+                  "_type": "UMLAttribute",
+                  "_id": "attr_se2",
+                  "_parent": {
+                    "$ref": "cls_seance"
+                  },
+                  "name": "dateHeureDebut",
+                  "visibility": "private",
+                  "type": "LocalDateTime"
+                },
+                {
+                  "_type": "UMLAttribute",
+                  "_id": "attr_se3",
+                  "_parent": {
+                    "$ref": "cls_seance"
+                  },
+                  "name": "dateHeureFin",
+                  "visibility": "private",
+                  "type": "LocalDateTime"
+                },
+                {
+                  "_type": "UMLAttribute",
+                  "_id": "attr_se4",
+                  "_parent": {
+                    "$ref": "cls_seance"
+                  },
+                  "name": "placesDisponibles",
+                  "visibility": "private",
+                  "type": "int"
+                }
+              ],
+              "operations": [
+                {
+                  "_type": "UMLOperation",
+                  "_id": "op_se1",
+                  "_parent": {
+                    "$ref": "cls_seance"
+                  },
+                  "name": "verifierChevauchement",
+                  "visibility": "public"
+                },
+                {
+                  "_type": "UMLOperation",
+                  "_id": "op_se2",
+                  "_parent": {
+                    "$ref": "cls_seance"
+                  },
+                  "name": "verifierDisponibilite",
+                  "visibility": "public"
+                }
+              ],
+              "ownedElements": [
+                {
+                  "_type": "UMLAssociation",
+                  "_id": "assoc_seance_res",
+                  "_parent": {
+                    "$ref": "cls_seance"
+                  },
+                  "name": "possede",
+                  "end1": {
+                    "_type": "UMLAssociationEnd",
+                    "_id": "ae_sr1",
+                    "_parent": {
+                      "$ref": "assoc_seance_res"
+                    },
+                    "reference": {
+                      "$ref": "cls_seance"
+                    },
+                    "multiplicity": "1"
+                  },
+                  "end2": {
+                    "_type": "UMLAssociationEnd",
+                    "_id": "ae_sr2",
+                    "_parent": {
+                      "$ref": "assoc_seance_res"
+                    },
+                    "reference": {
+                      "$ref": "cls_reservation"
+                    },
+                    "multiplicity": "0..*"
+                  }
+                }
+              ]
+            },
+            {
+              "_type": "UMLClass",
+              "_id": "cls_client",
+              "_parent": {
+                "$ref": "pkg_classes"
+              },
+              "name": "Client",
+              "attributes": [
+                {
+                  "_type": "UMLAttribute",
+                  "_id": "attr_c1",
+                  "_parent": {
+                    "$ref": "cls_client"
+                  },
+                  "name": "idClient",
+                  "visibility": "private",
+                  "type": "int"
+                },
+                {
+                  "_type": "UMLAttribute",
+                  "_id": "attr_c2",
+                  "_parent": {
+                    "$ref": "cls_client"
+                  },
+                  "name": "nom",
+                  "visibility": "private",
+                  "type": "String"
+                },
+                {
+                  "_type": "UMLAttribute",
+                  "_id": "attr_c3",
+                  "_parent": {
+                    "$ref": "cls_client"
+                  },
+                  "name": "prenom",
+                  "visibility": "private",
+                  "type": "String"
+                },
+                {
+                  "_type": "UMLAttribute",
+                  "_id": "attr_c4",
+                  "_parent": {
+                    "$ref": "cls_client"
+                  },
+                  "name": "email",
+                  "visibility": "private",
+                  "type": "String"
+                },
+                {
+                  "_type": "UMLAttribute",
+                  "_id": "attr_c5",
+                  "_parent": {
+                    "$ref": "cls_client"
+                  },
+                  "name": "telephone",
+                  "visibility": "private",
+                  "type": "String"
+                }
+              ],
+              "ownedElements": [
+                {
+                  "_type": "UMLAssociation",
+                  "_id": "assoc_client_res",
+                  "_parent": {
+                    "$ref": "cls_client"
+                  },
+                  "name": "effectue",
+                  "end1": {
+                    "_type": "UMLAssociationEnd",
+                    "_id": "ae_cr1",
+                    "_parent": {
+                      "$ref": "assoc_client_res"
+                    },
+                    "reference": {
+                      "$ref": "cls_client"
+                    },
+                    "multiplicity": "1"
+                  },
+                  "end2": {
+                    "_type": "UMLAssociationEnd",
+                    "_id": "ae_cr2",
+                    "_parent": {
+                      "$ref": "assoc_client_res"
+                    },
+                    "reference": {
+                      "$ref": "cls_reservation"
+                    },
+                    "multiplicity": "0..*"
+                  }
+                },
+                {
+                  "_type": "UMLAssociation",
+                  "_id": "assoc_client_avis",
+                  "_parent": {
+                    "$ref": "cls_client"
+                  },
+                  "name": "redige",
+                  "end1": {
+                    "_type": "UMLAssociationEnd",
+                    "_id": "ae_ca1",
+                    "_parent": {
+                      "$ref": "assoc_client_avis"
+                    },
+                    "reference": {
+                      "$ref": "cls_client"
+                    },
+                    "multiplicity": "1"
+                  },
+                  "end2": {
+                    "_type": "UMLAssociationEnd",
+                    "_id": "ae_ca2",
+                    "_parent": {
+                      "$ref": "assoc_client_avis"
+                    },
+                    "reference": {
+                      "$ref": "cls_avis"
+                    },
+                    "multiplicity": "0..*"
+                  }
+                }
+              ]
+            },
+            {
+              "_type": "UMLClass",
+              "_id": "cls_tarif",
+              "_parent": {
+                "$ref": "pkg_classes"
+              },
+              "name": "Tarif",
+              "attributes": [
+                {
+                  "_type": "UMLAttribute",
+                  "_id": "attr_t1",
+                  "_parent": {
+                    "$ref": "cls_tarif"
+                  },
+                  "name": "idTarif",
+                  "visibility": "private",
+                  "type": "int"
+                },
+                {
+                  "_type": "UMLAttribute",
+                  "_id": "attr_t2",
+                  "_parent": {
+                    "$ref": "cls_tarif"
+                  },
+                  "name": "libelle",
+                  "visibility": "private",
+                  "type": "String"
+                },
+                {
+                  "_type": "UMLAttribute",
+                  "_id": "attr_t3",
+                  "_parent": {
+                    "$ref": "cls_tarif"
+                  },
+                  "name": "prixUnitaire",
+                  "visibility": "private",
+                  "type": "double"
+                }
+              ],
+              "ownedElements": [
+                {
+                  "_type": "UMLAssociation",
+                  "_id": "assoc_tarif_res",
+                  "_parent": {
+                    "$ref": "cls_tarif"
+                  },
+                  "name": "applique",
+                  "end1": {
+                    "_type": "UMLAssociationEnd",
+                    "_id": "ae_tr1",
+                    "_parent": {
+                      "$ref": "assoc_tarif_res"
+                    },
+                    "reference": {
+                      "$ref": "cls_tarif"
+                    },
+                    "multiplicity": "1"
+                  },
+                  "end2": {
+                    "_type": "UMLAssociationEnd",
+                    "_id": "ae_tr2",
+                    "_parent": {
+                      "$ref": "assoc_tarif_res"
+                    },
+                    "reference": {
+                      "$ref": "cls_reservation"
+                    },
+                    "multiplicity": "0..*"
+                  }
+                }
+              ]
+            },
+            {
+              "_type": "UMLClass",
+              "_id": "cls_reservation",
+              "_parent": {
+                "$ref": "pkg_classes"
+              },
+              "name": "Reservation",
+              "attributes": [
+                {
+                  "_type": "UMLAttribute",
+                  "_id": "attr_r1",
+                  "_parent": {
+                    "$ref": "cls_reservation"
+                  },
+                  "name": "idReservation",
+                  "visibility": "private",
+                  "type": "int"
+                },
+                {
+                  "_type": "UMLAttribute",
+                  "_id": "attr_r2",
+                  "_parent": {
+                    "$ref": "cls_reservation"
+                  },
+                  "name": "numeroBillet",
+                  "visibility": "private",
+                  "type": "String"
+                },
+                {
+                  "_type": "UMLAttribute",
+                  "_id": "attr_r3",
+                  "_parent": {
+                    "$ref": "cls_reservation"
+                  },
+                  "name": "dateReservation",
+                  "visibility": "private",
+                  "type": "LocalDateTime"
+                },
+                {
+                  "_type": "UMLAttribute",
+                  "_id": "attr_r4",
+                  "_parent": {
+                    "$ref": "cls_reservation"
+                  },
+                  "name": "nbPlaces",
+                  "visibility": "private",
+                  "type": "int"
+                },
+                {
+                  "_type": "UMLAttribute",
+                  "_id": "attr_r5",
+                  "_parent": {
+                    "$ref": "cls_reservation"
+                  },
+                  "name": "montantTotal",
+                  "visibility": "private",
+                  "type": "double"
+                },
+                {
+                  "_type": "UMLAttribute",
+                  "_id": "attr_r6",
+                  "_parent": {
+                    "$ref": "cls_reservation"
+                  },
+                  "name": "statut",
+                  "visibility": "private",
+                  "type": "String"
+                }
+              ],
+              "operations": [
+                {
+                  "_type": "UMLOperation",
+                  "_id": "op_r1",
+                  "_parent": {
+                    "$ref": "cls_reservation"
+                  },
+                  "name": "calculerMontantTotal",
+                  "visibility": "public"
+                },
+                {
+                  "_type": "UMLOperation",
+                  "_id": "op_r2",
+                  "_parent": {
+                    "$ref": "cls_reservation"
+                  },
+                  "name": "annulerReservation",
+                  "visibility": "public"
+                }
+              ]
+            },
+            {
+              "_type": "UMLClass",
+              "_id": "cls_avis",
+              "_parent": {
+                "$ref": "pkg_classes"
+              },
+              "name": "Avis",
+              "attributes": [
+                {
+                  "_type": "UMLAttribute",
+                  "_id": "attr_a1",
+                  "_parent": {
+                    "$ref": "cls_avis"
+                  },
+                  "name": "idAvis",
+                  "visibility": "private",
+                  "type": "int"
+                },
+                {
+                  "_type": "UMLAttribute",
+                  "_id": "attr_a2",
+                  "_parent": {
+                    "$ref": "cls_avis"
+                  },
+                  "name": "note",
+                  "visibility": "private",
+                  "type": "int"
+                },
+                {
+                  "_type": "UMLAttribute",
+                  "_id": "attr_a3",
+                  "_parent": {
+                    "$ref": "cls_avis"
+                  },
+                  "name": "commentaire",
+                  "visibility": "private",
+                  "type": "String"
+                },
+                {
+                  "_type": "UMLAttribute",
+                  "_id": "attr_a4",
+                  "_parent": {
+                    "$ref": "cls_avis"
+                  },
+                  "name": "dateAvis",
+                  "visibility": "private",
+                  "type": "LocalDate"
+                }
+              ]
+            },
+            {
+              "_type": "UMLClass",
+              "_id": "cls_log",
+              "_parent": {
+                "$ref": "pkg_classes"
+              },
+              "name": "LogAction",
+              "attributes": [
+                {
+                  "_type": "UMLAttribute",
+                  "_id": "attr_l1",
+                  "_parent": {
+                    "$ref": "cls_log"
+                  },
+                  "name": "idLog",
+                  "visibility": "private",
+                  "type": "int"
+                },
+                {
+                  "_type": "UMLAttribute",
+                  "_id": "attr_l2",
+                  "_parent": {
+                    "$ref": "cls_log"
+                  },
+                  "name": "action",
+                  "visibility": "private",
+                  "type": "String"
+                },
+                {
+                  "_type": "UMLAttribute",
+                  "_id": "attr_l3",
+                  "_parent": {
+                    "$ref": "cls_log"
+                  },
+                  "name": "dateHeure",
+                  "visibility": "private",
+                  "type": "LocalDateTime"
+                },
+                {
+                  "_type": "UMLAttribute",
+                  "_id": "attr_l4",
+                  "_parent": {
+                    "$ref": "cls_log"
+                  },
+                  "name": "donneesConcernees",
+                  "visibility": "private",
+                  "type": "String"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "_type": "UMLCollaboration",
+          "_id": "collab_seq",
+          "_parent": {
+            "$ref": "model_cinetrack"
+          },
+          "name": "3_Sequence_Reservation",
+          "ownedElements": [
+            {
+              "_type": "UMLInteraction",
+              "_id": "inter_seq",
+              "_parent": {
+                "$ref": "collab_seq"
+              },
+              "name": "Interaction_Reservation_Billet",
+              "ownedElements": [
+                {
+                  "_type": "UMLSequenceDiagram",
+                  "_id": "diag_seq",
+                  "_parent": {
+                    "$ref": "inter_seq"
+                  },
+                  "name": "Diagramme_Sequence_Reservation",
+                  "ownedViews": []
+                }
+              ],
+              "participants": [
+                {
+                  "_type": "UMLLifeline",
+                  "_id": "ll_caissier",
+                  "_parent": {
+                    "$ref": "inter_seq"
+                  },
+                  "name": "Caissier"
+                },
+                {
+                  "_type": "UMLLifeline",
+                  "_id": "ll_controller",
+                  "_parent": {
+                    "$ref": "inter_seq"
+                  },
+                  "name": "ReservationController"
+                },
+                {
+                  "_type": "UMLLifeline",
+                  "_id": "ll_service",
+                  "_parent": {
+                    "$ref": "inter_seq"
+                  },
+                  "name": "ReservationService"
+                },
+                {
+                  "_type": "UMLLifeline",
+                  "_id": "ll_dao",
+                  "_parent": {
+                    "$ref": "inter_seq"
+                  },
+                  "name": "ReservationDAO"
+                },
+                {
+                  "_type": "UMLLifeline",
+                  "_id": "ll_db",
+                  "_parent": {
+                    "$ref": "inter_seq"
+                  },
+                  "name": "PostgreSQL"
+                }
+              ],
+              "messages": [
+                {
+                  "_type": "UMLMessage",
+                  "_id": "msg_1",
+                  "_parent": {
+                    "$ref": "inter_seq"
+                  },
+                  "name": "saisirReservation(idClient, idSeance, idTarif, nbPlaces)",
+                  "source": {
+                    "$ref": "ll_caissier"
+                  },
+                  "target": {
+                    "$ref": "ll_controller"
+                  }
+                },
+                {
+                  "_type": "UMLMessage",
+                  "_id": "msg_2",
+                  "_parent": {
+                    "$ref": "inter_seq"
+                  },
+                  "name": "creerReservation()",
+                  "source": {
+                    "$ref": "ll_controller"
+                  },
+                  "target": {
+                    "$ref": "ll_service"
+                  }
+                },
+                {
+                  "_type": "UMLMessage",
+                  "_id": "msg_3",
+                  "_parent": {
+                    "$ref": "inter_seq"
+                  },
+                  "name": "getPlacesDisponibles(idSeance)",
+                  "source": {
+                    "$ref": "ll_service"
+                  },
+                  "target": {
+                    "$ref": "ll_dao"
+                  }
+                },
+                {
+                  "_type": "UMLMessage",
+                  "_id": "msg_4",
+                  "_parent": {
+                    "$ref": "inter_seq"
+                  },
+                  "name": "SELECT places_disponibles FROM seance",
+                  "source": {
+                    "$ref": "ll_dao"
+                  },
+                  "target": {
+                    "$ref": "ll_db"
+                  }
+                },
+                {
+                  "_type": "UMLMessage",
+                  "_id": "msg_5",
+                  "_parent": {
+                    "$ref": "inter_seq"
+                  },
+                  "name": "calculerMontantTotal(prixUnitaire, nbPlaces)",
+                  "source": {
+                    "$ref": "ll_service"
+                  },
+                  "target": {
+                    "$ref": "ll_service"
+                  }
+                },
+                {
+                  "_type": "UMLMessage",
+                  "_id": "msg_6",
+                  "_parent": {
+                    "$ref": "inter_seq"
+                  },
+                  "name": "saveReservation(reservation)",
+                  "source": {
+                    "$ref": "ll_service"
+                  },
+                  "target": {
+                    "$ref": "ll_dao"
+                  }
+                },
+                {
+                  "_type": "UMLMessage",
+                  "_id": "msg_7",
+                  "_parent": {
+                    "$ref": "inter_seq"
+                  },
+                  "name": "CALL sp_creer_reservation() + Trigger MAJ places",
+                  "source": {
+                    "$ref": "ll_dao"
+                  },
+                  "target": {
+                    "$ref": "ll_db"
+                  }
+                },
+                {
+                  "_type": "UMLMessage",
+                  "_id": "msg_8",
+                  "_parent": {
+                    "$ref": "inter_seq"
+                  },
+                  "name": "afficherBilletUnique(numeroBillet)",
+                  "messageSort": "reply",
+                  "source": {
+                    "$ref": "ll_controller"
+                  },
+                  "target": {
+                    "$ref": "ll_caissier"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
