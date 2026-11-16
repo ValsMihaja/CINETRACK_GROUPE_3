@@ -1,0 +1,7 @@
+# Fichiers de compilation Maven / Eclipse / IntelliJ
+target/
+bin/
+.idea/
+*.iml
+hs_err_pid*.log
+.DS_Store

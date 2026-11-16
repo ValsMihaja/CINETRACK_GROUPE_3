@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="12.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controller.BilletterieControleur">
+
+    <HBox spacing="12.0" alignment="CENTER_LEFT">
+        <Label text="Guichet Billetterie, Réservations &amp; Fiches Clients" styleClass="section-title"/>
+        <Label fx:id="lblMessageBilletterie" text=""/>
+    </HBox>
+
+    <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+
+        <!-- ONGLET 1 : VENTE & RÉSERVATION DE BILLETS -->
+        <Tab text="🎟 Réservation de Places &amp; Billets">
+            <VBox spacing="12.0">
+                <padding>
+                    <Insets top="12.0" right="4.0" bottom="4.0" left="4.0"/>
+                </padding>
+
+                <HBox spacing="14.0">
+                    <!-- Formulaire de réservation -->
+                    <VBox styleClass="card" spacing="10.0" HBox.hgrow="ALWAYS">
+                        <Label text="Nouvelle Réservation" styleClass="section-title"/>
+
+                        <HBox spacing="10.0" alignment="CENTER_LEFT">
+                            <Label text="Séance :" prefWidth="110.0"/>
+                            <ComboBox fx:id="cbSeance" prefWidth="420.0"/>
+                            <Label fx:id="lblPlacesRestantes" text="--" styleClass="badge-success"/>
+                        </HBox>
+
+                        <HBox spacing="10.0" alignment="CENTER_LEFT">
+                            <Label text="Client :" prefWidth="110.0"/>
+                            <ComboBox fx:id="cbClient" prefWidth="420.0"/>
+                        </HBox>
+
+                        <HBox spacing="10.0" alignment="CENTER_LEFT">
+                            <Label text="Tarif :" prefWidth="110.0"/>
+                            <ComboBox fx:id="cbTarif" prefWidth="250.0"/>
+                            <Label text="Nb Places :"/>
+                            <Spinner fx:id="spNbPlaces" prefWidth="85.0"/>
+                        </HBox>
+
+                        <HBox spacing="12.0" alignment="CENTER_LEFT">
+                            <Label text="Montant Total calculé :" prefWidth="150.0"/>
+                            <Label fx:id="lblMontantCalcule" text="0.00 Rs"
+                                   style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2563eb;"/>
+                            <Button text="Valider &amp; Générer Billet" onAction="#onReserverPlaces" styleClass="btn-gold"/>
+                            <Button text="Annuler la réservation sélectionnée" onAction="#onAnnulerReservation" styleClass="btn-danger"/>
+                        </HBox>
+                    </VBox>
+
+                    <!-- Aperçu du Billet Unique -->
+                    <VBox styleClass="card" spacing="8.0" prefWidth="360.0">
+                        <Label text="Billet Unique &amp; Récapitulatif" styleClass="section-title"/>
+                        <TextArea fx:id="txtBilletGenere" editable="false" prefRowCount="8"
+                                  styleClass="ticket-area" promptText="Le billet généré s'affichera ici..."/>
+                    </VBox>
+                </HBox>
+
+                <!-- Tableau des réservations -->
+                <TableView fx:id="tableReservations" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colNumBillet" text="N° Billet Unique" prefWidth="150.0"/>
+                        <TableColumn fx:id="colSeanceRes" text="Séance (Film / Salle / Horaire)" prefWidth="310.0"/>
+                        <TableColumn fx:id="colClientRes" text="Client" prefWidth="160.0"/>
+                        <TableColumn fx:id="colTarifRes" text="Catégorie Tarifaire" prefWidth="140.0"/>
+                        <TableColumn fx:id="colNbPlacesRes" text="Places" prefWidth="70.0"/>
+                        <TableColumn fx:id="colMontantRes" text="Montant Total" prefWidth="110.0"/>
+                        <TableColumn fx:id="colStatutRes" text="Statut" prefWidth="100.0"/>
+                    </columns>
+                    <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                    </columnResizePolicy>
+                </TableView>
+            </VBox>
+        </Tab>
+
+        <!-- ONGLET 2 : GESTION DES FICHES CLIENTS -->
+        <Tab text="👥 Fiches Clients">
+            <VBox spacing="12.0">
+                <padding>
+                    <Insets top="12.0" right="4.0" bottom="4.0" left="4.0"/>
+                </padding>
+
+                <HBox styleClass="card" spacing="10.0" alignment="CENTER_LEFT">
+                    <TextField fx:id="txtClientNom" promptText="Nom *" prefWidth="150.0"/>
+                    <TextField fx:id="txtClientPrenom" promptText="Prénom *" prefWidth="150.0"/>
+                    <TextField fx:id="txtClientEmail" promptText="Email" prefWidth="210.0"/>
+                    <TextField fx:id="txtClientTelephone" promptText="Téléphone" prefWidth="130.0"/>
+                    <Button text="Créer Fiche Client" onAction="#onAjouterClient" styleClass="btn-primary"/>
+                    <TextField fx:id="txtRechercheClient" promptText="Rechercher un client..." prefWidth="170.0"/>
+                    <Button text="Rechercher" onAction="#onRechercherClient" styleClass="btn-secondary"/>
+                </HBox>
+
+                <TableView fx:id="tableClients" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colIdClient" text="ID" prefWidth="60.0"/>
+                        <TableColumn fx:id="colNomClient" text="Nom" prefWidth="180.0"/>
+                        <TableColumn fx:id="colPrenomClient" text="Prénom" prefWidth="180.0"/>
+                        <TableColumn fx:id="colEmailClient" text="Email" prefWidth="260.0"/>
+                        <TableColumn fx:id="colTelClient" text="Téléphone" prefWidth="160.0"/>
+                    </columns>
+                    <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                    </columnResizePolicy>
+                </TableView>
+            </VBox>
+        </Tab>
+
+    </TabPane>
+</VBox>
