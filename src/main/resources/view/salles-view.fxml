@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controller.SalleControleur"
+      spacing="14">
+
+    <Label text="Salles" styleClass="page-title"/>
+    <Label fx:id="lblMessage" text="" wrapText="true"/>
+
+    <VBox spacing="10" styleClass="card">
+        <Label text="Fiche salle" styleClass="section-title"/>
+        <HBox spacing="10">
+            <TextField fx:id="txtNom" promptText="Nom" HBox.hgrow="ALWAYS"/>
+            <TextField fx:id="txtCapacite" promptText="Capacité" prefWidth="120"/>
+            <TextField fx:id="txtEquipement" promptText="Équipement" HBox.hgrow="ALWAYS"/>
+        </HBox>
+        <HBox spacing="10">
+            <Button fx:id="btnAjouter" text="Ajouter" onAction="#onAjouter" styleClass="btn-primary"/>
+            <Button fx:id="btnModifier" text="Modifier" onAction="#onModifier" styleClass="btn-secondary"/>
+            <Button fx:id="btnSupprimer" text="Supprimer" onAction="#onSupprimer" styleClass="btn-danger"/>
+        </HBox>
+    </VBox>
+
+    <TableView fx:id="tableSalles" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colId" text="ID" prefWidth="60"/>
+            <TableColumn fx:id="colNom" text="Nom" prefWidth="200"/>
+            <TableColumn fx:id="colCapacite" text="Capacité" prefWidth="120"/>
+            <TableColumn fx:id="colEquipement" text="Équipement" prefWidth="320"/>
+        </columns>
+    </TableView>
+
+</VBox>

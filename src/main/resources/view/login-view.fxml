@@ -5,7 +5,6 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
@@ -14,15 +13,11 @@
            fx:controller="controller.AuthentificationControleur"
            styleClass="login-bg">
 
-    <VBox alignment="CENTER" maxWidth="400" spacing="18" styleClass="login-card">
+    <VBox alignment="CENTER" maxWidth="380" spacing="16" styleClass="login-card">
         <VBox spacing="4" alignment="CENTER_LEFT">
             <Label text="CineTrack" styleClass="app-title"/>
-            <Label text="Connexion au backoffice" styleClass="app-subtitle"/>
+            <Label text="Connexion" styleClass="app-subtitle"/>
         </VBox>
-
-        <HBox alignment="CENTER_LEFT">
-            <Label fx:id="lblEtatBdd" text="Vérification base de données..." styleClass="badge-success"/>
-        </HBox>
 
         <VBox spacing="6">
             <Label text="Identifiant" styleClass="field-label"/>
@@ -34,7 +29,7 @@
             <PasswordField fx:id="txtMotDePasse" promptText="Mot de passe" onAction="#onSeConnecter"/>
         </VBox>
 
-        <Label fx:id="lblMessage" text="" wrapText="true" minHeight="20"/>
+        <Label fx:id="lblMessage" text="" wrapText="true" minHeight="18"/>
 
         <Button text="Se connecter" onAction="#onSeConnecter" maxWidth="Infinity" styleClass="btn-primary">
             <VBox.margin>

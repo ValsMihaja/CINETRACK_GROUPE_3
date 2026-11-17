@@ -25,10 +25,25 @@ public class DashboardControleur {
     private Button btnNavBilletterie;
 
     @FXML
-    private Button btnNavProgrammation;
+    private Button btnNavClients;
+
+    @FXML
+    private Button btnNavSeances;
+
+    @FXML
+    private Button btnNavFilms;
+
+    @FXML
+    private Button btnNavSalles;
+
+    @FXML
+    private Button btnNavTarifs;
 
     @FXML
     private Button btnNavStatistiques;
+
+    @FXML
+    private Button btnNavAdministration;
 
     @FXML
     private StackPane contentPane;
@@ -37,28 +52,55 @@ public class DashboardControleur {
 
     @FXML
     public void initialize() {
-        Utilisateur u = authService.getUtilisateurConnecte();
+        Utilisateur u = AuthentificationService.getSession();
         if (u != null) {
             lblUtilisateurConnecte.setText(u.getNomComplet());
             lblRoleBadge.setText(u.getRole());
+
             btnNavStatistiques.setDisable(!u.estManagerOuPlus());
+            btnNavAdministration.setDisable(!u.estAdmin());
         }
         onAfficherBilletterie();
     }
 
     @FXML
     private void onAfficherBilletterie() {
-        chargerSousVue("/view/billetterie-view.fxml", btnNavBilletterie);
+        chargerVue("/view/billetterie-view.fxml", btnNavBilletterie);
     }
 
     @FXML
-    private void onAfficherProgrammation() {
-        chargerSousVue("/view/programmation-view.fxml", btnNavProgrammation);
+    private void onAfficherClients() {
+        chargerVue("/view/clients-view.fxml", btnNavClients);
+    }
+
+    @FXML
+    private void onAfficherSeances() {
+        chargerVue("/view/seances-view.fxml", btnNavSeances);
+    }
+
+    @FXML
+    private void onAfficherFilms() {
+        chargerVue("/view/films-view.fxml", btnNavFilms);
+    }
+
+    @FXML
+    private void onAfficherSalles() {
+        chargerVue("/view/salles-view.fxml", btnNavSalles);
+    }
+
+    @FXML
+    private void onAfficherTarifs() {
+        chargerVue("/view/tarifs-view.fxml", btnNavTarifs);
     }
 
     @FXML
     private void onAfficherStatistiques() {
-        chargerSousVue("/view/statistiques-view.fxml", btnNavStatistiques);
+        chargerVue("/view/statistiques-view.fxml", btnNavStatistiques);
+    }
+
+    @FXML
+    private void onAfficherAdministration() {
+        chargerVue("/view/administration-view.fxml", btnNavAdministration);
     }
 
     @FXML
@@ -70,15 +112,19 @@ public class DashboardControleur {
         Main.afficherEcranConnexion();
     }
 
-    private void chargerSousVue(String fxmlPath, Button boutonActif) {
+    private void chargerVue(String fxmlPath, Button boutonActif) {
         try {
             Parent vue = FXMLLoader.load(getClass().getResource(fxmlPath));
             contentPane.getChildren().setAll(vue);
 
-            btnNavBilletterie.getStyleClass().remove("nav-btn-active");
-            btnNavProgrammation.getStyleClass().remove("nav-btn-active");
-            btnNavStatistiques.getStyleClass().remove("nav-btn-active");
-            if (boutonActif != null && !boutonActif.getStyleClass().contains("nav-btn-active")) {
+            Button[] boutons = {
+                    btnNavBilletterie, btnNavClients, btnNavSeances, btnNavFilms,
+                    btnNavSalles, btnNavTarifs, btnNavStatistiques, btnNavAdministration
+            };
+            for (Button btn : boutons) {
+                btn.getStyleClass().remove("nav-btn-active");
+            }
+            if (boutonActif != null) {
                 boutonActif.getStyleClass().add("nav-btn-active");
             }
         } catch (IOException e) {

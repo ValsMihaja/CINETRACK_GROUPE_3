@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controller.FilmControleur"
+      spacing="14">
+
+    <Label text="Films" styleClass="page-title"/>
+    <Label fx:id="lblMessage" text="" wrapText="true"/>
+
+    <VBox spacing="10" styleClass="card">
+        <Label text="Fiche film" styleClass="section-title"/>
+        <HBox spacing="10">
+            <TextField fx:id="txtTitre" promptText="Titre" HBox.hgrow="ALWAYS"/>
+            <TextField fx:id="txtGenre" promptText="Genre" prefWidth="160"/>
+            <TextField fx:id="txtDuree" promptText="Durée (min)" prefWidth="110"/>
+            <TextField fx:id="txtNote" promptText="Note (0-10)" prefWidth="100"/>
+        </HBox>
+        <TextArea fx:id="txtSynopsis" promptText="Synopsis" prefHeight="60"/>
+        <HBox spacing="10">
+            <Button fx:id="btnAjouter" text="Ajouter" onAction="#onAjouter" styleClass="btn-primary"/>
+            <Button fx:id="btnModifier" text="Modifier" onAction="#onModifier" styleClass="btn-secondary"/>
+            <Button fx:id="btnSupprimer" text="Supprimer" onAction="#onSupprimer" styleClass="btn-danger"/>
+        </HBox>
+    </VBox>
+
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <TextField fx:id="txtRechercheTitre" promptText="Titre" prefWidth="220"/>
+        <TextField fx:id="txtRechercheGenre" promptText="Genre" prefWidth="160"/>
+        <Button text="Rechercher" onAction="#onRechercher" styleClass="btn-secondary"/>
+    </HBox>
+
+    <TableView fx:id="tableFilms" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colId" text="ID" prefWidth="60"/>
+            <TableColumn fx:id="colTitre" text="Titre" prefWidth="260"/>
+            <TableColumn fx:id="colGenre" text="Genre" prefWidth="150"/>
+            <TableColumn fx:id="colDuree" text="Durée (min)" prefWidth="110"/>
+            <TableColumn fx:id="colNote" text="Note" prefWidth="90"/>
+        </columns>
+    </TableView>
+
+</VBox>

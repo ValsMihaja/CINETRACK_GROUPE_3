@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controller.TarifControleur"
+      spacing="14">
+
+    <Label text="Tarifs" styleClass="page-title"/>
+    <Label fx:id="lblMessage" text="" wrapText="true"/>
+
+    <VBox spacing="10" styleClass="card">
+        <Label text="Modifier un tarif" styleClass="section-title"/>
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <TextField fx:id="txtCategorie" editable="false" promptText="Catégorie" prefWidth="150"/>
+            <TextField fx:id="txtLibelle" promptText="Libellé" prefWidth="180"/>
+            <TextField fx:id="txtPrix" promptText="Prix (Rs)" prefWidth="100"/>
+            <TextField fx:id="txtDescription" promptText="Description" HBox.hgrow="ALWAYS"/>
+            <CheckBox fx:id="chkActif" text="Actif"/>
+            <Button fx:id="btnModifier" text="Enregistrer" onAction="#onModifier" styleClass="btn-primary"/>
+        </HBox>
+    </VBox>
+
+    <TableView fx:id="tableTarifs" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colId" text="ID" prefWidth="60"/>
+            <TableColumn fx:id="colCategorie" text="Catégorie" prefWidth="150"/>
+            <TableColumn fx:id="colLibelle" text="Libellé" prefWidth="170"/>
+            <TableColumn fx:id="colPrix" text="Prix unitaire" prefWidth="120"/>
+            <TableColumn fx:id="colDescription" text="Description" prefWidth="320"/>
+        </columns>
+    </TableView>
+
+</VBox>

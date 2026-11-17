@@ -1,6 +1,5 @@
 package main;
 
-import database.DatabaseConnection;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -42,9 +41,9 @@ public class Main extends Application {
             Scene scene = new Scene(root, 1220, 760);
             appliquerFeuilleDeStyle(scene);
 
-            Utilisateur u = new AuthentificationService().getUtilisateurConnecte();
+            Utilisateur u = AuthentificationService.getSession();
             String role = u != null ? u.getRole() : "";
-            primaryStage.setTitle("CineTrack - Gestion Cinéma (" + role + ")");
+            primaryStage.setTitle("CineTrack - Backoffice (" + role + ")");
             primaryStage.setScene(scene);
             primaryStage.centerOnScreen();
             primaryStage.show();
@@ -61,7 +60,6 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) {
-        System.out.println("Connexion PostgreSQL : " + (DatabaseConnection.testConnection() ? "OK" : "ECHEC"));
         launch(args);
     }
 }

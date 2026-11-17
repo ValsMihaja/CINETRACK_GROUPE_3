@@ -1,8 +1,12 @@
 package service;
 
 import dao.LogSecuriteDao;
+import dao.StatistiqueDao;
 import impl.LogSecuriteDaoImpl;
+import impl.StatistiqueDaoImpl;
 import model.LogSecurite;
+import model.StatFilm;
+import model.StatOccupation;
 import model.Utilisateur;
 
 import java.io.BufferedWriter;
@@ -15,36 +19,31 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Map;
 
 public class StatistiqueEtSauvegardeService implements ExportService {
 
+    private final StatistiqueDao statistiqueDao = new StatistiqueDaoImpl();
     private final LogSecuriteDao logSecuriteDao = new LogSecuriteDaoImpl();
     private final AuthentificationService authService = new AuthentificationService();
-    private Utilisateur operateurCourant;
 
     public double obtenirChiffreAffairesTotal() throws SQLException {
-        return logSecuriteDao.getChiffreAffairesTotal();
+        return statistiqueDao.getChiffreAffairesTotal();
     }
 
     public int obtenirTotalBilletsVendus() throws SQLException {
-        return logSecuriteDao.getTotalBilletsVendus();
+        return statistiqueDao.getTotalBilletsVendus();
     }
 
     public int obtenirTotalReservationsConfirmees() throws SQLException {
-        return logSecuriteDao.getTotalReservationsConfirmees();
+        return statistiqueDao.getTotalReservationsConfirmees();
     }
 
-    public List<Map<String, Object>> obtenirTopFilms() throws SQLException {
-        return logSecuriteDao.getTopFilms();
+    public List<StatFilm> obtenirTopFilms() throws SQLException {
+        return statistiqueDao.getTopFilms();
     }
 
-    public List<Map<String, Object>> obtenirTauxOccupationSeances() throws SQLException {
-        return logSecuriteDao.getTauxOccupationSeances();
-    }
-
-    public List<Map<String, Object>> obtenirChiffreAffairesParPeriode() throws SQLException {
-        return logSecuriteDao.getChiffreAffairesParPeriode();
+    public List<StatOccupation> obtenirTauxOccupationSeances() throws SQLException {
+        return statistiqueDao.getTauxOccupationSeances();
     }
 
     public List<LogSecurite> consulterLogsSecurite() throws SQLException {
@@ -53,8 +52,8 @@ public class StatistiqueEtSauvegardeService implements ExportService {
 
     @Override
     public boolean exporterCSV(String cheminFichier) throws Exception {
-        List<Map<String, Object>> topFilms = obtenirTopFilms();
-        List<Map<String, Object>> occupation = obtenirTauxOccupationSeances();
+        List<StatFilm> topFilms = obtenirTopFilms();
+        List<StatOccupation> occupation = obtenirTauxOccupationSeances();
 
         File fichier = new File(cheminFichier);
         if (fichier.getParentFile() != null) {
@@ -64,43 +63,27 @@ public class StatistiqueEtSauvegardeService implements ExportService {
         try (BufferedWriter writer = new BufferedWriter(
                 new OutputStreamWriter(new FileOutputStream(fichier), StandardCharsets.UTF_8))) {
             writer.write('\ufeff');
-            writer.write("RAPPORT D'EXPLOITATION CINETRACK V2\n");
-            writer.write("Date d'export;" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")) + "\n");
-            writer.write("Chiffre d'affaires global (Rs);" + String.format("%.2f", obtenirChiffreAffairesTotal()) + "\n");
-            writer.write("Total places vendues;" + obtenirTotalBilletsVendus() + "\n\n");
+            writer.write("RAPPORT CINETRACK V2\n");
+            writer.write("Date;" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")) + "\n");
+            writer.write("Chiffre d'affaires (Rs);" + String.format("%.2f", obtenirChiffreAffairesTotal()) + "\n");
+            writer.write("Places vendues;" + obtenirTotalBilletsVendus() + "\n\n");
 
-            writer.write("CLASSEMENT DES FILMS LES PLUS RESERVES\n");
-            writer.write("ID Film;Titre;Genre;Note;Nb Réservations;Places Vendues;Chiffre d'Affaires (Rs)\n");
-            for (Map<String, Object> ligne : topFilms) {
-                writer.write(
-                        ligne.get("idFilm") + ";"
-                                + ligne.get("titre") + ";"
-                                + ligne.get("genre") + ";"
-                                + ligne.get("noteMoyenne") + ";"
-                                + ligne.get("nbReservations") + ";"
-                                + ligne.get("placesVendues") + ";"
-                                + String.format("%.2f", (Double) ligne.get("chiffreAffaires")) + "\n"
-                );
+            writer.write("TOP FILMS\n");
+            writer.write("Titre;Genre;Note;Places Vendues;Chiffre d'Affaires (Rs)\n");
+            for (StatFilm f : topFilms) {
+                writer.write(f.getTitre() + ";" + f.getGenre() + ";" + f.getNoteMoyenne()
+                        + ";" + f.getPlacesVendues() + ";" + String.format("%.2f", f.getChiffreAffaires()) + "\n");
             }
 
-            writer.write("\nTAUX D'OCCUPATION PAR SEANCE\n");
-            writer.write("ID Séance;Date;Heure;Salle;Film;Capacité;Places Occupées;Places Dispo;Taux Occupation (%)\n");
-            for (Map<String, Object> ligne : occupation) {
-                writer.write(
-                        ligne.get("idSeance") + ";"
-                                + ligne.get("dateSeance") + ";"
-                                + ligne.get("heure") + ";"
-                                + ligne.get("salle") + ";"
-                                + ligne.get("film") + ";"
-                                + ligne.get("capacite") + ";"
-                                + ligne.get("placesOccupees") + ";"
-                                + ligne.get("placesDispo") + ";"
-                                + ligne.get("tauxOccupation") + "%\n"
-                );
+            writer.write("\nOCCUPATION DES SEANCES\n");
+            writer.write("Date;Heure;Salle;Film;Capacité;Places Occupées;Taux (%)\n");
+            for (StatOccupation s : occupation) {
+                writer.write(s.getDateSeance() + ";" + s.getHeure() + ";" + s.getSalle() + ";" + s.getFilm()
+                        + ";" + s.getCapacite() + ";" + s.getPlacesOccupees() + ";" + s.getTauxOccupation() + "%\n");
             }
         }
 
-        Utilisateur op = getOperateur();
+        Utilisateur op = authService.getUtilisateurConnecte();
         logSecuriteDao.enregistrerLog(
                 op != null ? op.getIdUtilisateur() : null,
                 op != null ? op.getLogin() : "SYSTEM",
@@ -142,12 +125,11 @@ public class StatistiqueEtSauvegardeService implements ExportService {
             try (BufferedWriter w = new BufferedWriter(
                     new OutputStreamWriter(new FileOutputStream(fichierBackup), StandardCharsets.UTF_8))) {
                 w.write("-- Sauvegarde CineTrack Groupe 3 (" + horodatage + ")\n");
-                w.write("-- Base : cinetrack_groupe3\n");
             }
             succes = true;
         }
 
-        Utilisateur op = getOperateur();
+        Utilisateur op = authService.getUtilisateurConnecte();
         try {
             logSecuriteDao.enregistrerLog(
                     op != null ? op.getIdUtilisateur() : null,
@@ -174,13 +156,5 @@ public class StatistiqueEtSauvegardeService implements ExportService {
             }
         }
         return null;
-    }
-
-    private Utilisateur getOperateur() {
-        return operateurCourant != null ? operateurCourant : authService.getUtilisateurConnecte();
-    }
-
-    public void setOperateurCourant(Utilisateur operateurCourant) {
-        this.operateurCourant = operateurCourant;
     }
 }

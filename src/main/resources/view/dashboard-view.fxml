@@ -14,11 +14,8 @@
             fx:controller="controller.DashboardControleur">
 
     <left>
-        <VBox spacing="14" prefWidth="220" styleClass="sidebar">
-            <VBox spacing="2">
-                <Label text="CineTrack" styleClass="sidebar-brand"/>
-                <Label text="Cinéma Le Lumière" style="-fx-text-fill: #94A3B8; -fx-font-size: 11px;"/>
-            </VBox>
+        <VBox spacing="12" prefWidth="210" styleClass="sidebar">
+            <Label text="CineTrack" styleClass="sidebar-brand"/>
 
             <VBox spacing="4" styleClass="sidebar-user-box">
                 <Label fx:id="lblUtilisateurConnecte" text="Utilisateur" styleClass="sidebar-user" wrapText="true"/>
@@ -27,13 +24,23 @@
 
             <Separator style="-fx-opacity: 0.2;"/>
 
-            <VBox spacing="6">
-                <Button fx:id="btnNavBilletterie" text="Billetterie et Clients"
+            <VBox spacing="4">
+                <Button fx:id="btnNavBilletterie" text="Billetterie"
                         onAction="#onAfficherBilletterie" maxWidth="Infinity" styleClass="nav-btn"/>
-                <Button fx:id="btnNavProgrammation" text="Films, Salles et Séances"
-                        onAction="#onAfficherProgrammation" maxWidth="Infinity" styleClass="nav-btn"/>
-                <Button fx:id="btnNavStatistiques" text="Statistiques et Admin"
+                <Button fx:id="btnNavClients" text="Clients"
+                        onAction="#onAfficherClients" maxWidth="Infinity" styleClass="nav-btn"/>
+                <Button fx:id="btnNavSeances" text="Séances"
+                        onAction="#onAfficherSeances" maxWidth="Infinity" styleClass="nav-btn"/>
+                <Button fx:id="btnNavFilms" text="Films"
+                        onAction="#onAfficherFilms" maxWidth="Infinity" styleClass="nav-btn"/>
+                <Button fx:id="btnNavSalles" text="Salles"
+                        onAction="#onAfficherSalles" maxWidth="Infinity" styleClass="nav-btn"/>
+                <Button fx:id="btnNavTarifs" text="Tarifs"
+                        onAction="#onAfficherTarifs" maxWidth="Infinity" styleClass="nav-btn"/>
+                <Button fx:id="btnNavStatistiques" text="Statistiques"
                         onAction="#onAfficherStatistiques" maxWidth="Infinity" styleClass="nav-btn"/>
+                <Button fx:id="btnNavAdministration" text="Administration"
+                        onAction="#onAfficherAdministration" maxWidth="Infinity" styleClass="nav-btn"/>
             </VBox>
 
             <Region VBox.vgrow="ALWAYS"/>

@@ -1,14 +1,13 @@
 package controller;
 
-import database.DatabaseConnection;
 import exceptions.AuthentificationException;
 import exceptions.CompteBloqueException;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.paint.Color;
 import main.Main;
-import model.Utilisateur;
 import service.AuthentificationService;
 
 import java.sql.SQLException;
@@ -24,22 +23,7 @@ public class AuthentificationControleur {
     @FXML
     private Label lblMessage;
 
-    @FXML
-    private Label lblEtatBdd;
-
     private final AuthentificationService authService = new AuthentificationService();
-
-    @FXML
-    public void initialize() {
-        boolean bddOk = DatabaseConnection.testConnection();
-        if (lblEtatBdd != null) {
-            lblEtatBdd.setText(bddOk
-                    ? "Base PostgreSQL connectée"
-                    : "Base PostgreSQL hors ligne (localhost:5432)");
-            lblEtatBdd.getStyleClass().removeAll("badge-success", "badge-danger");
-            lblEtatBdd.getStyleClass().add(bddOk ? "badge-success" : "badge-danger");
-        }
-    }
 
     @FXML
     private void onSeConnecter() {
@@ -47,8 +31,7 @@ public class AuthentificationControleur {
         String mdp = txtMotDePasse.getText();
 
         try {
-            Utilisateur u = authService.authentifier(login, mdp);
-            afficherMessage("Bienvenue " + u.getNomComplet(), false);
+            authService.authentifier(login, mdp);
             Main.afficherTableauDeBord();
         } catch (CompteBloqueException | AuthentificationException e) {
             afficherMessage(e.getMessage(), true);
@@ -58,9 +41,8 @@ public class AuthentificationControleur {
         }
     }
 
-    private void afficherMessage(String texte, boolean erreur) {
+    private void afficherMessage(String texte, boolean estErreur) {
         lblMessage.setText(texte);
-        lblMessage.getStyleClass().removeAll("msg-error", "msg-success");
-        lblMessage.getStyleClass().add(erreur ? "msg-error" : "msg-success");
+        lblMessage.setTextFill(estErreur ? Color.RED : Color.DARKGREEN);
     }
 }

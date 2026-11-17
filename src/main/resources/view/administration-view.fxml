@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controller.AdministrationControleur"
+      spacing="14">
+
+    <Label text="Administration" styleClass="page-title"/>
+    <Label fx:id="lblMessage" text="" wrapText="true"/>
+
+    <VBox spacing="10" styleClass="card">
+        <Label text="Nouvel utilisateur" styleClass="section-title"/>
+        <HBox spacing="10">
+            <TextField fx:id="txtLogin" promptText="Identifiant" HBox.hgrow="ALWAYS"/>
+            <PasswordField fx:id="txtMotDePasse" promptText="Mot de passe" HBox.hgrow="ALWAYS"/>
+            <TextField fx:id="txtNom" promptText="Nom" HBox.hgrow="ALWAYS"/>
+            <TextField fx:id="txtPrenom" promptText="Prénom" HBox.hgrow="ALWAYS"/>
+            <ComboBox fx:id="cbRole" prefWidth="130"/>
+        </HBox>
+        <HBox spacing="10">
+            <Button text="Créer" onAction="#onCreerUtilisateur" styleClass="btn-primary"/>
+            <Button text="Débloquer" onAction="#onDebloquerUtilisateur" styleClass="btn-secondary"/>
+            <Button text="Supprimer" onAction="#onSupprimerUtilisateur" styleClass="btn-danger"/>
+            <Button text="Sauvegarder BDD" onAction="#onSauvegarderBDD" styleClass="btn-secondary"/>
+        </HBox>
+    </VBox>
+
+    <TableView fx:id="tableUtilisateurs" prefHeight="160">
+        <columns>
+            <TableColumn fx:id="colUserId" text="ID" prefWidth="60"/>
+            <TableColumn fx:id="colUserLogin" text="Identifiant" prefWidth="140"/>
+            <TableColumn fx:id="colUserNom" text="Nom complet" prefWidth="220"/>
+            <TableColumn fx:id="colUserRole" text="Rôle" prefWidth="110"/>
+            <TableColumn fx:id="colUserStatut" text="Statut" prefWidth="180"/>
+        </columns>
+    </TableView>
+
+    <Label text="Logs de sécurité" styleClass="section-title"/>
+    <TableView fx:id="tableLogs" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colLogId" text="ID" prefWidth="60"/>
+            <TableColumn fx:id="colLogDate" text="Date" prefWidth="150"/>
+            <TableColumn fx:id="colLogUser" text="Utilisateur" prefWidth="120"/>
+            <TableColumn fx:id="colLogAction" text="Action" prefWidth="180"/>
+            <TableColumn fx:id="colLogDetails" text="Détails" prefWidth="360"/>
+        </columns>
+    </TableView>
+
+</VBox>

@@ -51,11 +51,16 @@
 ### 3.2 Couche Controller (`src/main/java/controller/`)
 | Contrôleur | Vue associée & Rôle actuel |
 | :--- | :--- |
-| `AuthentificationControleur.java` | Contrôle `login-view.fxml` : affiche l'état de connexion PostgreSQL et vérifie les identifiants via `AuthentificationService` avant redirection vers le tableau de bord (sans identifiants de test affichés à l'écran). |
-| `DashboardControleur.java` | Contrôle `dashboard-view.fxml` : affiche l'utilisateur connecté et son rôle, gère la navigation entre sous-vues (`billetterie-view.fxml`, `programmation-view.fxml`, `statistiques-view.fxml`), restreint l'accès aux statistiques aux rôles `MANAGER` / `ADMIN`, et gère la déconnexion. |
-| `BilletterieControleur.java` | Contrôle `billetterie-view.fxml` : sélection séance/client/tarif, calcul dynamique du devis et des places restantes, réservation avec génération et affichage du billet unique récapitulatif, annulation de réservation, création et recherche de fiches clients. |
-| `ProgrammationControleur.java` | Contrôle `programmation-view.fxml` : gestion multi-onglets des Séances (programmation, filtrage par date/salle/film, suppression, conflits horaires), Films (CRUD + recherche titre/genre), Salles (CRUD) et Tarifs (modification et archivage), avec désactivation des actions d'édition pour le `CAISSIER`. |
-| `StatistiqueControleur.java` | Contrôle `statistiques-view.fxml` : KPI globaux (CA total, billets vendus, réservations confirmées), tableaux Top Films et Taux d'occupation par séance, export CSV (`exports/rapport_exploitation_cinetrack.csv`), et onglet Administration réservé à `ADMIN` (création/déblocage/suppression d'utilisateurs, consultation `logs_securite`, sauvegarde PostgreSQL `backups/`). |
+| `AuthentificationControleur.java` | Contrôle `login-view.fxml` : récupère login/mot de passe, appelle `AuthentificationService` et ouvre le tableau de bord (sans badge de connexion BDD ni identifiants de test). |
+| `DashboardControleur.java` | Contrôle `dashboard-view.fxml` : gère le menu latéral par rôle et la déconnexion. |
+| `BilletterieControleur.java` | Contrôle `billetterie-view.fxml` : réservations, annulations et aperçu du billet. |
+| `ClientControleur.java` | Contrôle `clients-view.fxml` : ajout, recherche et liste des clients. |
+| `SeanceControleur.java` | Contrôle `seances-view.fxml` : programmation, filtrage et suppression des séances. |
+| `FilmControleur.java` | Contrôle `films-view.fxml` : ajout, modification, suppression et recherche des films. |
+| `SalleControleur.java` | Contrôle `salles-view.fxml` : ajout, modification et suppression des salles. |
+| `TarifControleur.java` | Contrôle `tarifs-view.fxml` : consultation et modification des tarifs. |
+| `StatistiqueControleur.java` | Contrôle `statistiques-view.fxml` : KPI, Top Films, occupation par séance et export CSV. |
+| `AdministrationControleur.java` | Contrôle `administration-view.fxml` : gestion des utilisateurs, logs de sécurité et sauvegarde BDD. |
 
 ### 3.3 Couche Service (`src/main/java/service/`)
 | Service / Interface | Rôle actuel |
@@ -76,7 +81,9 @@
 | `Client.java` | Table `clients` : `idClient`, `nom`, `prenom`, `email`, `telephone`, `dateInscription`, `getNomComplet()`. |
 | `Tarif.java` | Table `tarifs` : `categorie` (`PLEIN_TARIF`, `TARIF_REDUIT`, `TARIF_ETUDIANT`, `ABONNEMENT`), `libelle`, `prixUnitaire`, `description`, `actif`, et `calculerMontant(nbPlaces)`. |
 | `Reservation.java` | Table `reservations` : `numeroBillet`, références séance/client/tarif/utilisateur, `nbPlaces`, `montantTotal`, `dateReservation`, `statut` (`CONFIRMEE`/`ANNULEE`), et `genererRecapitulatifBillet()`. |
-| `LogSecurite.java` | Table `logs_securite` (CC4) : `idLog`, `idUtilisateur`, `utilisateurLogin`, `action`, `tableConcernee`, `donneesConcernees`, `dateHeure`. |
+| `LogSecurite.java` | Table `logs_securite` (CC4) : `idLog`, `idUtilisateur`, `utilisateurLogin`, `action`, `tableConcernee`, `donneesConcernees`, `dateHeure`, `getDateTexte()`. |
+| `StatFilm.java` | Modèle d'affichage des statistiques par film (`titre`, `genre`, `noteTexte`, `placesVendues`, `chiffreAffairesTexte`). |
+| `StatOccupation.java` | Modèle d'affichage du taux d'occupation par séance (`dateSeance`, `heure`, `salle`, `film`, `occupationTexte`, `tauxTexte`). |
 
 ### 3.5 Couche DAO (`src/main/java/dao/` & `src/main/java/impl/`)
 | Interface DAO (`dao/`) | Implémentation JDBC (`impl/`) | Rôle actuel |
@@ -88,17 +95,23 @@
 | `ClientDao` | `ClientDaoImpl` | CRUD `clients` et recherche par mot-clé (`rechercher`). |
 | `TarifDao` | `TarifDaoImpl` | CRUD `tarifs`, filtrage des tarifs actifs (`findActifs`) et recherche par catégorie (`findByCategorie`). |
 | `ReservationDao` | `ReservationDaoImpl` | Lecture/CRUD `reservations`, recherche par `numeroBillet` et appels aux procédures stockées PostgreSQL `sp_creer_reservation` et `sp_annuler_reservation` via `CallableStatement`. |
-| `LogSecuriteDao` | `LogSecuriteDaoImpl` | Insertion/lecture dans `logs_securite` (CC4) et requêtes d'indicateurs statistiques (CA total, billets, réservations confirmées, Top Films, taux d'occupation, CA par période). |
+| `LogSecuriteDao` | `LogSecuriteDaoImpl` | Insertion et lecture de `logs_securite` (CC4). |
+| `StatistiqueDao` | `StatistiqueDaoImpl` | Requêtes statistiques d'exploitation (CA total, billets, réservations confirmées, Top Films, taux d'occupation). |
 
 ### 3.6 Ressources Vues FXML & CSS (`src/main/resources/`)
 | Fichier | Rôle actuel |
 | :--- | :--- |
-| `view/login-view.fxml` | Écran de connexion minimaliste (état BDD, champs login/mot de passe, sans comptes de test affichés). |
-| `view/dashboard-view.fxml` | Conteneur principal `BorderPane` avec barre latérale de navigation par rôle et `StackPane` central dynamique. |
-| `view/billetterie-view.fxml` | Interface de réservation/annulation, aperçu du billet unique et gestion/recherche des clients. |
-| `view/programmation-view.fxml` | Interface à onglets pour la programmation des séances (avec filtres), gestion des films, salles et tarifs. |
-| `view/statistiques-view.fxml` | Interface KPI, tableaux Top Films / occupation, export CSV, gestion des utilisateurs (`ADMIN`), logs CC4 et sauvegarde BDD. |
-| `css/style.css` | Feuille de style minimaliste professionnelle (fond clair `#F4F6F9`, cartes blanches `#FFFFFF`, barre latérale `#1E293B`, accent `#2563EB`). |
+| `view/login-view.fxml` | Écran de connexion minimaliste (sans badge BDD ni comptes de test). |
+| `view/dashboard-view.fxml` | Menu latéral et conteneur central. |
+| `view/billetterie-view.fxml` | Vue réservations et aperçu du billet. |
+| `view/clients-view.fxml` | Vue ajout et recherche de clients. |
+| `view/seances-view.fxml` | Vue programmation et filtrage des séances. |
+| `view/films-view.fxml` | Vue gestion du catalogue des films. |
+| `view/salles-view.fxml` | Vue gestion des salles. |
+| `view/tarifs-view.fxml` | Vue gestion des tarifs. |
+| `view/statistiques-view.fxml` | Vue KPI, Top Films, taux d'occupation et export CSV. |
+| `view/administration-view.fxml` | Vue gestion des utilisateurs, logs de sécurité et sauvegarde BDD. |
+| `css/style.css` | Feuille de style minimaliste professionnelle. |
 
 ### 3.7 Base de Données SQL (`sql/`) & Tests (`src/test/`)
 | Fichier | Rôle actuel |
@@ -113,6 +126,14 @@
 ---
 
 ## 4. JOURNAL DES MODIFICATIONS DE L'ÉQUIPE
+
+- **2026-11-17 — Découpage clair 1 contrôleur / 1 vue par écran & suppression du badge BDD sur le login :**
+  - **Fichiers créés / modifiés :**
+    - Suppression de `lblEtatBdd` (« Base PostgreSQL connectée ») dans `view/login-view.fxml` et `AuthentificationControleur.java`, ainsi que de l'affichage console de connexion BDD au démarrage dans `Main.java`.
+    - Découpage en contrôleurs et vues simples et séparés (sans `TabPane` ni `Map<String, Object>` ni lambdas dans les tableaux) : `BilletterieControleur` (`billetterie-view.fxml`), `ClientControleur` (`clients-view.fxml`), `SeanceControleur` (`seances-view.fxml`), `FilmControleur` (`films-view.fxml`), `SalleControleur` (`salles-view.fxml`), `TarifControleur` (`tarifs-view.fxml`), `StatistiqueControleur` (`statistiques-view.fxml`) et `AdministrationControleur` (`administration-view.fxml`). Suppression de `ProgrammationControleur.java` et `programmation-view.fxml`.
+    - Séparation de `StatistiqueDao` / `StatistiqueDaoImpl` (avec modèles `StatFilm` et `StatOccupation`) et de `LogSecuriteDao` / `LogSecuriteDaoImpl`, et utilisation de `PropertyValueFactory` dans tous les tableaux.
+  - **Vérification :** `mvn clean test` (4/4 tests JUnit 5 passés, 0 échec) et `main.TestArchitectureMVC` exécuté avec succès sur `cinetrack_groupe3`.
+  - **Points d'attention :** chaque écran possède désormais son propre fichier `.fxml` dans `src/main/resources/view/` et son propre contrôleur dans `src/main/java/controller/`.
 
 - **2026-11-17 — Simplification niveau L2 BTS SIO, package `impl/` externe, vues minimalistes & BDD `cinetrack_groupe3` :**
   - **Fichiers créés / modifiés :**

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controller.ClientControleur"
+      spacing="14">
+
+    <Label text="Clients" styleClass="page-title"/>
+    <Label fx:id="lblMessage" text="" wrapText="true"/>
+
+    <VBox spacing="10" styleClass="card">
+        <Label text="Nouveau client" styleClass="section-title"/>
+        <HBox spacing="10">
+            <TextField fx:id="txtNom" promptText="Nom" HBox.hgrow="ALWAYS"/>
+            <TextField fx:id="txtPrenom" promptText="Prénom" HBox.hgrow="ALWAYS"/>
+            <TextField fx:id="txtEmail" promptText="Email" HBox.hgrow="ALWAYS"/>
+            <TextField fx:id="txtTelephone" promptText="Téléphone" HBox.hgrow="ALWAYS"/>
+            <Button text="Ajouter" onAction="#onAjouter" styleClass="btn-primary"/>
+        </HBox>
+    </VBox>
+
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <TextField fx:id="txtRecherche" promptText="Rechercher un client" prefWidth="300"/>
+        <Button text="Rechercher" onAction="#onRechercher" styleClass="btn-secondary"/>
+    </HBox>
+
+    <TableView fx:id="tableClients" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colId" text="ID" prefWidth="60"/>
+            <TableColumn fx:id="colNom" text="Nom" prefWidth="160"/>
+            <TableColumn fx:id="colPrenom" text="Prénom" prefWidth="160"/>
+            <TableColumn fx:id="colEmail" text="Email" prefWidth="240"/>
+            <TableColumn fx:id="colTelephone" text="Téléphone" prefWidth="150"/>
+        </columns>
+    </TableView>
+
+</VBox>

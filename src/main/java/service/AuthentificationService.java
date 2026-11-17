@@ -196,6 +196,10 @@ public class AuthentificationService {
         return hashStocke.equals(motDePasseClair);
     }
 
+    public static Utilisateur getSession() {
+        return utilisateurConnecte;
+    }
+
     public Utilisateur getUtilisateurConnecte() {
         return utilisateurConnecte;
     }

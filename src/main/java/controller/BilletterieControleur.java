@@ -1,7 +1,6 @@
 package controller;
 
 import exceptions.CineTrackException;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
@@ -11,15 +10,14 @@ import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.paint.Color;
 import model.Client;
 import model.Reservation;
 import model.Seance;
 import model.Tarif;
 import service.AuthentificationService;
 import service.BilletterieService;
-import service.ProgrammationService;
 
 import java.sql.SQLException;
 
@@ -38,16 +36,16 @@ public class BilletterieControleur {
     private Spinner<Integer> spNbPlaces;
 
     @FXML
-    private Label lblMontantCalcule;
+    private Label lblPlacesRestantes;
 
     @FXML
-    private Label lblPlacesRestantes;
+    private Label lblMontantCalcule;
 
     @FXML
     private TextArea txtBilletGenere;
 
     @FXML
-    private Label lblMessageBilletterie;
+    private Label lblMessage;
 
     @FXML
     private TableView<Reservation> tableReservations;
@@ -56,96 +54,106 @@ public class BilletterieControleur {
     private TableColumn<Reservation, String> colNumBillet;
 
     @FXML
-    private TableColumn<Reservation, String> colSeanceRes;
+    private TableColumn<Reservation, String> colSeance;
 
     @FXML
-    private TableColumn<Reservation, String> colClientRes;
+    private TableColumn<Reservation, String> colClient;
 
     @FXML
-    private TableColumn<Reservation, String> colTarifRes;
+    private TableColumn<Reservation, String> colTarif;
 
     @FXML
-    private TableColumn<Reservation, Integer> colNbPlacesRes;
+    private TableColumn<Reservation, Integer> colNbPlaces;
 
     @FXML
-    private TableColumn<Reservation, String> colMontantRes;
+    private TableColumn<Reservation, String> colMontant;
 
     @FXML
-    private TableColumn<Reservation, String> colStatutRes;
-
-    @FXML
-    private TextField txtClientNom;
-
-    @FXML
-    private TextField txtClientPrenom;
-
-    @FXML
-    private TextField txtClientEmail;
-
-    @FXML
-    private TextField txtClientTelephone;
-
-    @FXML
-    private TextField txtRechercheClient;
-
-    @FXML
-    private TableView<Client> tableClients;
-
-    @FXML
-    private TableColumn<Client, Integer> colIdClient;
-
-    @FXML
-    private TableColumn<Client, String> colNomClient;
-
-    @FXML
-    private TableColumn<Client, String> colPrenomClient;
-
-    @FXML
-    private TableColumn<Client, String> colEmailClient;
-
-    @FXML
-    private TableColumn<Client, String> colTelClient;
+    private TableColumn<Reservation, String> colStatut;
 
     private final BilletterieService billetterieService = new BilletterieService();
-    private final ProgrammationService programmationService = new ProgrammationService();
-    private final AuthentificationService authService = new AuthentificationService();
 
     @FXML
     public void initialize() {
         spNbPlaces.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 20, 1));
 
         colNumBillet.setCellValueFactory(new PropertyValueFactory<>("numeroBillet"));
-        colSeanceRes.setCellValueFactory(new PropertyValueFactory<>("infoSeance"));
-        colClientRes.setCellValueFactory(new PropertyValueFactory<>("nomCompletClient"));
-        colTarifRes.setCellValueFactory(new PropertyValueFactory<>("libelleTarif"));
-        colNbPlacesRes.setCellValueFactory(new PropertyValueFactory<>("nbPlaces"));
-        colMontantRes.setCellValueFactory(cell ->
-                new SimpleStringProperty(String.format("%.2f Rs", cell.getValue().getMontantTotal())));
-        colStatutRes.setCellValueFactory(new PropertyValueFactory<>("statut"));
+        colSeance.setCellValueFactory(new PropertyValueFactory<>("infoSeance"));
+        colClient.setCellValueFactory(new PropertyValueFactory<>("nomCompletClient"));
+        colTarif.setCellValueFactory(new PropertyValueFactory<>("libelleTarif"));
+        colNbPlaces.setCellValueFactory(new PropertyValueFactory<>("nbPlaces"));
+        colMontant.setCellValueFactory(new PropertyValueFactory<>("montantTexte"));
+        colStatut.setCellValueFactory(new PropertyValueFactory<>("statut"));
 
-        colIdClient.setCellValueFactory(new PropertyValueFactory<>("idClient"));
-        colNomClient.setCellValueFactory(new PropertyValueFactory<>("nom"));
-        colPrenomClient.setCellValueFactory(new PropertyValueFactory<>("prenom"));
-        colEmailClient.setCellValueFactory(new PropertyValueFactory<>("email"));
-        colTelClient.setCellValueFactory(new PropertyValueFactory<>("telephone"));
+        cbSeance.setOnAction(e -> mettreAJourCalcul());
+        cbTarif.setOnAction(e -> mettreAJourCalcul());
+        spNbPlaces.valueProperty().addListener((obs, ancien, nouveau) -> mettreAJourCalcul());
 
-        cbSeance.valueProperty().addListener((obs, oldV, newV) -> mettreAJourDevis());
-        cbTarif.valueProperty().addListener((obs, oldV, newV) -> mettreAJourDevis());
-        spNbPlaces.valueProperty().addListener((obs, oldV, newV) -> mettreAJourDevis());
-
-        tableReservations.getSelectionModel().selectedItemProperty().addListener((obs, oldV, res) -> {
+        tableReservations.getSelectionModel().selectedItemProperty().addListener((obs, ancien, res) -> {
             if (res != null) {
                 txtBilletGenere.setText(res.genererRecapitulatifBillet());
             }
         });
 
-        rafraichirDonnees();
+        rafraichirTable();
     }
 
     @FXML
-    public void rafraichirDonnees() {
+    private void onReserver() {
+        Seance seance = cbSeance.getValue();
+        Client client = cbClient.getValue();
+        Tarif tarif = cbTarif.getValue();
+        Integer nbPlaces = spNbPlaces.getValue();
+
+        if (seance == null || client == null || tarif == null || nbPlaces == null) {
+            afficherMessage("Veuillez remplir tous les champs.", true);
+            return;
+        }
+
         try {
-            cbSeance.setItems(FXCollections.observableArrayList(programmationService.listerSeances()));
+            Reservation billet = billetterieService.reserverPlaces(
+                    seance.getIdSeance(),
+                    client.getIdClient(),
+                    tarif.getIdTarif(),
+                    nbPlaces,
+                    AuthentificationService.getSession()
+            );
+            txtBilletGenere.setText(billet.genererRecapitulatifBillet());
+            afficherMessage("Réservation confirmée : " + billet.getNumeroBillet(), false);
+            rafraichirTable();
+        } catch (CineTrackException e) {
+            afficherMessage(e.getMessage(), true);
+        } catch (SQLException e) {
+            afficherMessage("Erreur base de données : " + e.getMessage(), true);
+        }
+    }
+
+    @FXML
+    private void onAnnuler() {
+        Reservation selection = tableReservations.getSelectionModel().getSelectedItem();
+        if (selection == null) {
+            afficherMessage("Sélectionnez une réservation dans le tableau.", true);
+            return;
+        }
+
+        try {
+            billetterieService.annulerReservation(
+                    selection.getIdReservation(),
+                    AuthentificationService.getSession()
+            );
+            afficherMessage("Réservation annulée.", false);
+            rafraichirTable();
+        } catch (CineTrackException e) {
+            afficherMessage(e.getMessage(), true);
+        } catch (SQLException e) {
+            afficherMessage("Erreur base de données : " + e.getMessage(), true);
+        }
+    }
+
+    @FXML
+    private void rafraichirTable() {
+        try {
+            cbSeance.setItems(FXCollections.observableArrayList(billetterieService.listerSeances()));
             cbClient.setItems(FXCollections.observableArrayList(billetterieService.listerClients()));
             cbTarif.setItems(FXCollections.observableArrayList(billetterieService.listerTarifsActifs()));
 
@@ -160,123 +168,34 @@ public class BilletterieControleur {
             }
 
             tableReservations.setItems(FXCollections.observableArrayList(billetterieService.listerReservations()));
-            tableClients.setItems(FXCollections.observableArrayList(billetterieService.listerClients()));
-            mettreAJourDevis();
+            mettreAJourCalcul();
         } catch (SQLException e) {
             afficherMessage("Erreur chargement : " + e.getMessage(), true);
         }
     }
 
-    private void mettreAJourDevis() {
+    private void mettreAJourCalcul() {
         Seance s = cbSeance.getValue();
         if (s != null) {
-            lblPlacesRestantes.setText(s.getPlacesDispo() + " / " + s.getCapaciteSalle() + " places");
+            lblPlacesRestantes.setText(s.getPlacesDispo() + " / " + s.getCapaciteSalle());
         } else {
             lblPlacesRestantes.setText("--");
         }
 
         Tarif t = cbTarif.getValue();
         Integer nb = spNbPlaces.getValue();
-        if (t != null && nb != null && nb > 0) {
+        if (t != null && nb != null) {
             try {
                 double total = billetterieService.calculerMontantTotal(t, nb);
                 lblMontantCalcule.setText(String.format("%.2f Rs", total));
             } catch (CineTrackException e) {
                 lblMontantCalcule.setText("0.00 Rs");
             }
-        } else {
-            lblMontantCalcule.setText("0.00 Rs");
         }
     }
 
-    @FXML
-    private void onReserverPlaces() {
-        Seance seance = cbSeance.getValue();
-        Client client = cbClient.getValue();
-        Tarif tarif = cbTarif.getValue();
-        Integer nbPlaces = spNbPlaces.getValue();
-
-        if (seance == null || client == null || tarif == null || nbPlaces == null) {
-            afficherMessage("Veuillez sélectionner une séance, un client, un tarif et un nombre de places.", true);
-            return;
-        }
-
-        try {
-            Reservation billet = billetterieService.reserverPlaces(
-                    seance.getIdSeance(),
-                    client.getIdClient(),
-                    tarif.getIdTarif(),
-                    nbPlaces,
-                    authService.getUtilisateurConnecte()
-            );
-
-            txtBilletGenere.setText(billet.genererRecapitulatifBillet());
-            afficherMessage("Réservation confirmée : " + billet.getNumeroBillet(), false);
-            rafraichirDonnees();
-        } catch (CineTrackException e) {
-            afficherMessage(e.getMessage(), true);
-        } catch (SQLException e) {
-            afficherMessage("Erreur SQL : " + e.getMessage(), true);
-        }
-    }
-
-    @FXML
-    private void onAnnulerReservation() {
-        Reservation selection = tableReservations.getSelectionModel().getSelectedItem();
-        if (selection == null) {
-            afficherMessage("Sélectionnez une réservation dans le tableau.", true);
-            return;
-        }
-
-        try {
-            billetterieService.annulerReservation(
-                    selection.getIdReservation(),
-                    authService.getUtilisateurConnecte()
-            );
-            afficherMessage("Billet " + selection.getNumeroBillet() + " annulé.", false);
-            rafraichirDonnees();
-        } catch (CineTrackException e) {
-            afficherMessage(e.getMessage(), true);
-        } catch (SQLException e) {
-            afficherMessage("Erreur SQL : " + e.getMessage(), true);
-        }
-    }
-
-    @FXML
-    private void onAjouterClient() {
-        try {
-            billetterieService.ajouterClient(
-                    txtClientNom.getText(),
-                    txtClientPrenom.getText(),
-                    txtClientEmail.getText(),
-                    txtClientTelephone.getText()
-            );
-            txtClientNom.clear();
-            txtClientPrenom.clear();
-            txtClientEmail.clear();
-            txtClientTelephone.clear();
-            afficherMessage("Client enregistré.", false);
-            rafraichirDonnees();
-        } catch (CineTrackException e) {
-            afficherMessage(e.getMessage(), true);
-        } catch (SQLException e) {
-            afficherMessage("Erreur SQL : " + e.getMessage(), true);
-        }
-    }
-
-    @FXML
-    private void onRechercherClient() {
-        try {
-            String motCle = txtRechercheClient.getText();
-            tableClients.setItems(FXCollections.observableArrayList(billetterieService.rechercherClients(motCle)));
-        } catch (SQLException e) {
-            afficherMessage("Erreur recherche : " + e.getMessage(), true);
-        }
-    }
-
-    private void afficherMessage(String texte, boolean erreur) {
-        lblMessageBilletterie.setText(texte);
-        lblMessageBilletterie.getStyleClass().removeAll("msg-error", "msg-success");
-        lblMessageBilletterie.getStyleClass().add(erreur ? "msg-error" : "msg-success");
+    private void afficherMessage(String texte, boolean estErreur) {
+        lblMessage.setText(texte);
+        lblMessage.setTextFill(estErreur ? Color.RED : Color.DARKGREEN);
     }
 }
