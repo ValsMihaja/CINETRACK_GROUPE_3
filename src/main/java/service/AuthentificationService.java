@@ -1,12 +1,12 @@
 package service;
 
-import dao.ILogSecuriteDAO;
-import dao.IUtilisateurDAO;
-import dao.impl.LogSecuriteDAOImpl;
-import dao.impl.UtilisateurDAOImpl;
+import dao.LogSecuriteDao;
+import dao.UtilisateurDao;
 import exceptions.AuthentificationException;
 import exceptions.CineTrackException;
 import exceptions.CompteBloqueException;
+import impl.LogSecuriteDaoImpl;
+import impl.UtilisateurDaoImpl;
 import model.Utilisateur;
 
 import java.nio.charset.StandardCharsets;
@@ -16,44 +16,14 @@ import java.sql.SQLException;
 import java.util.Base64;
 import java.util.List;
 
-/**
- * ====================================================================
- * COUCHE : SERVICE (Authentification, Sécurité & Gestion des Utilisateurs)
- * ====================================================================
- * RÔLE :
- * - Vérifie les identifiants des utilisateurs internes (ADMIN, MANAGER, CAISSIER).
- * - Applique la règle métier de blocage automatique après 3 tentatives échouées.
- * - Hache les mots de passe (aucun stockage en clair).
- * - Journalise chaque tentative de connexion ou action sensible dans logs_securite.
- * - Utilise l'injection de dépendances par constructeur sur les interfaces DAO.
- * - Ne contient AUCUN import JavaFX ni AUCUNE requête SQL directe.
- */
 public class AuthentificationService {
 
     private static final int MAX_TENTATIVES = 3;
+    private static Utilisateur utilisateurConnecte;
 
-    private final IUtilisateurDAO utilisateurDAO;
-    private final ILogSecuriteDAO logSecuriteDAO;
-    private Utilisateur utilisateurConnecte;
+    private final UtilisateurDao utilisateurDao = new UtilisateurDaoImpl();
+    private final LogSecuriteDao logSecuriteDao = new LogSecuriteDaoImpl();
 
-    /**
-     * Constructeur avec injection de dépendances (inversion de contrôle).
-     */
-    public AuthentificationService(IUtilisateurDAO utilisateurDAO, ILogSecuriteDAO logSecuriteDAO) {
-        this.utilisateurDAO = utilisateurDAO;
-        this.logSecuriteDAO = logSecuriteDAO;
-    }
-
-    /**
-     * Constructeur par défaut utilisant les implémentations JDBC PostgreSQL.
-     */
-    public AuthentificationService() {
-        this(new UtilisateurDAOImpl(), new LogSecuriteDAOImpl());
-    }
-
-    /**
-     * Authentifie un utilisateur interne et applique le blocage au bout de 3 échecs.
-     */
     public Utilisateur authentifier(String login, String motDePasseClair)
             throws AuthentificationException, CompteBloqueException, SQLException {
 
@@ -62,45 +32,43 @@ public class AuthentificationService {
         }
 
         String loginNettoye = login.trim();
-        Utilisateur u = utilisateurDAO.findByLogin(loginNettoye);
+        Utilisateur u = utilisateurDao.findByLogin(loginNettoye);
 
         if (u == null) {
-            logSecuriteDAO.enregistrerLog(null, loginNettoye, "ECHEC_CONNEXION",
+            logSecuriteDao.enregistrerLog(null, loginNettoye, "ECHEC_CONNEXION",
                     "utilisateurs", "Tentative de connexion avec login inexistant : " + loginNettoye);
             throw new AuthentificationException("Identifiant ou mot de passe incorrect.");
         }
 
-        // Règle métier : compte bloqué si inactif ou >= 3 tentatives échouées
         if (!u.isActif() || u.getTentativesEchouees() >= MAX_TENTATIVES) {
-            logSecuriteDAO.enregistrerLog(u.getIdUtilisateur(), u.getLogin(), "CONNEXION_COMPTE_BLOQUE",
-                    "utilisateurs", "Tentative de connexion sur compte verrouillé (" + u.getTentativesEchouees() + " échecs)");
+            logSecuriteDao.enregistrerLog(u.getIdUtilisateur(), u.getLogin(), "CONNEXION_COMPTE_BLOQUE",
+                    "utilisateurs", "Tentative de connexion sur compte verrouillé");
             throw new CompteBloqueException(u.getLogin());
         }
 
         if (!verifierMotDePasse(motDePasseClair, u.getMotDePasse(), u.getLogin())) {
-            utilisateurDAO.incrementerTentatives(u.getLogin());
+            utilisateurDao.incrementerTentatives(u.getLogin());
             int nouvellesTentatives = u.getTentativesEchouees() + 1;
 
             if (nouvellesTentatives >= MAX_TENTATIVES) {
-                logSecuriteDAO.enregistrerLog(u.getIdUtilisateur(), u.getLogin(), "BLOCAGE_COMPTE",
+                logSecuriteDao.enregistrerLog(u.getIdUtilisateur(), u.getLogin(), "BLOCAGE_COMPTE",
                         "utilisateurs", "Compte verrouillé automatiquement après 3 tentatives échouées.");
                 throw new CompteBloqueException(u.getLogin());
-            } else {
-                int essaisRestants = MAX_TENTATIVES - nouvellesTentatives;
-                logSecuriteDAO.enregistrerLog(u.getIdUtilisateur(), u.getLogin(), "ECHEC_CONNEXION",
-                        "utilisateurs", "Mot de passe erroné (tentative " + nouvellesTentatives + "/3)");
-                throw new AuthentificationException(
-                        "Mot de passe incorrect. Attention : il vous reste " + essaisRestants + " tentative(s) avant blocage."
-                );
             }
+
+            int essaisRestants = MAX_TENTATIVES - nouvellesTentatives;
+            logSecuriteDao.enregistrerLog(u.getIdUtilisateur(), u.getLogin(), "ECHEC_CONNEXION",
+                    "utilisateurs", "Mot de passe erroné (tentative " + nouvellesTentatives + "/3)");
+            throw new AuthentificationException(
+                    "Mot de passe incorrect. Il vous reste " + essaisRestants + " tentative(s) avant blocage."
+            );
         }
 
-        // Connexion réussie : remise à zéro du compteur de tentatives
-        utilisateurDAO.reinitialiserTentatives(u.getIdUtilisateur());
+        utilisateurDao.reinitialiserTentatives(u.getIdUtilisateur());
         u.setTentativesEchouees(0);
-        this.utilisateurConnecte = u;
+        utilisateurConnecte = u;
 
-        logSecuriteDAO.enregistrerLog(u.getIdUtilisateur(), u.getLogin(), "CONNEXION_REUSSIE",
+        logSecuriteDao.enregistrerLog(u.getIdUtilisateur(), u.getLogin(), "CONNEXION_REUSSIE",
                 "utilisateurs", "Authentification réussie (Rôle : " + u.getRole() + ")");
 
         return u;
@@ -108,7 +76,7 @@ public class AuthentificationService {
 
     public void deconnecter() throws SQLException {
         if (utilisateurConnecte != null) {
-            logSecuriteDAO.enregistrerLog(
+            logSecuriteDao.enregistrerLog(
                     utilisateurConnecte.getIdUtilisateur(),
                     utilisateurConnecte.getLogin(),
                     "DECONNEXION",
@@ -120,7 +88,7 @@ public class AuthentificationService {
     }
 
     public List<Utilisateur> listerUtilisateurs() throws SQLException {
-        return utilisateurDAO.findAll();
+        return utilisateurDao.findAll();
     }
 
     public void ajouterUtilisateur(String login, String motDePasseClair, String nom, String prenom, String role)
@@ -137,7 +105,7 @@ public class AuthentificationService {
         if (role == null || (!role.equals("ADMIN") && !role.equals("MANAGER") && !role.equals("CAISSIER"))) {
             throw new CineTrackException("Le rôle doit être ADMIN, MANAGER ou CAISSIER.");
         }
-        if (utilisateurDAO.findByLogin(login.trim()) != null) {
+        if (utilisateurDao.findByLogin(login.trim()) != null) {
             throw new CineTrackException("L'identifiant '" + login.trim() + "' existe déjà.");
         }
 
@@ -149,9 +117,9 @@ public class AuthentificationService {
                 prenom != null ? prenom.trim() : "",
                 role
         );
-        utilisateurDAO.insert(nouveau);
+        utilisateurDao.insert(nouveau);
 
-        logSecuriteDAO.enregistrerLog(
+        logSecuriteDao.enregistrerLog(
                 getIdUtilisateurConnecte(),
                 getLoginConnecte(),
                 "CREATION_UTILISATEUR",
@@ -161,17 +129,17 @@ public class AuthentificationService {
     }
 
     public void debloquerUtilisateur(int idUtilisateur) throws CineTrackException, SQLException {
-        Utilisateur cible = utilisateurDAO.findById(idUtilisateur);
+        Utilisateur cible = utilisateurDao.findById(idUtilisateur);
         if (cible == null) {
             throw new CineTrackException("Utilisateur introuvable.");
         }
-        utilisateurDAO.debloquerCompte(idUtilisateur);
-        logSecuriteDAO.enregistrerLog(
+        utilisateurDao.debloquerCompte(idUtilisateur);
+        logSecuriteDao.enregistrerLog(
                 getIdUtilisateurConnecte(),
                 getLoginConnecte(),
                 "DEBLOCAGE_COMPTE",
                 "utilisateurs",
-                "Déblocage et réinitialisation des tentatives du compte '" + cible.getLogin() + "'"
+                "Déblocage du compte '" + cible.getLogin() + "'"
         );
     }
 
@@ -179,12 +147,12 @@ public class AuthentificationService {
         if (utilisateurConnecte != null && utilisateurConnecte.getIdUtilisateur() == idUtilisateur) {
             throw new CineTrackException("Vous ne pouvez pas supprimer votre propre compte en cours de session.");
         }
-        Utilisateur cible = utilisateurDAO.findById(idUtilisateur);
+        Utilisateur cible = utilisateurDao.findById(idUtilisateur);
         if (cible == null) {
             throw new CineTrackException("Utilisateur introuvable.");
         }
-        utilisateurDAO.delete(idUtilisateur);
-        logSecuriteDAO.enregistrerLog(
+        utilisateurDao.delete(idUtilisateur);
+        logSecuriteDao.enregistrerLog(
                 getIdUtilisateurConnecte(),
                 getLoginConnecte(),
                 "SUPPRESSION_UTILISATEUR",
@@ -193,9 +161,6 @@ public class AuthentificationService {
         );
     }
 
-    /**
-     * Génère une empreinte hachée au format $2a$12$ compatible avec la base PostgreSQL.
-     */
     public String hacherMotDePasse(String motDePasseClair) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
@@ -207,20 +172,14 @@ public class AuthentificationService {
         }
     }
 
-    /**
-     * Vérifie le mot de passe saisi vis-à-vis du hash stocké en base PostgreSQL.
-     * Supporte les hashes BCrypt du jeu de test initial ainsi que les hashes générés par l'application.
-     */
     public boolean verifierMotDePasse(String motDePasseClair, String hashStocke, String login) {
         if (motDePasseClair == null || hashStocke == null) {
             return false;
         }
-        // Vérification par empreinte calculée
         String hashCalcule = hacherMotDePasse(motDePasseClair);
         if (hashStocke.equals(hashCalcule)) {
             return true;
         }
-        // Support des comptes de démonstration hachés dans v2_insert_data.sql
         if (hashStocke.startsWith("$2a$")) {
             if ("admin".equalsIgnoreCase(login) && ("admin123".equals(motDePasseClair) || "admin".equals(motDePasseClair))) {
                 return true;
@@ -241,8 +200,8 @@ public class AuthentificationService {
         return utilisateurConnecte;
     }
 
-    public void setUtilisateurConnecte(Utilisateur utilisateurConnecte) {
-        this.utilisateurConnecte = utilisateurConnecte;
+    public void setUtilisateurConnecte(Utilisateur utilisateur) {
+        utilisateurConnecte = utilisateur;
     }
 
     public Integer getIdUtilisateurConnecte() {

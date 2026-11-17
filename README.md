@@ -1,64 +1,45 @@
-# 🎬 CineTrack V2 — Cinéma Le Lumière (RP2 BTS SIO SLAM)
+# CineTrack V2 — Cinéma Le Lumière (BTS SIO SLAM)
 
-Application Backoffice Desktop de gestion cinématographique développée en **Java 21 / JavaFX (FXML + CSS)** selon l'architecture **MVC en couches** avec **Injection de Dépendances** et persistance **PostgreSQL (JDBC)**.
+Application desktop JavaFX de gestion cinématographique développée selon l'architecture MVC avec persistance PostgreSQL (JDBC).
 
----
-
-## 1. Architecture en Couches (Étape 2)
+## 1. Architecture MVC
 
 ```
-View (FXML + CSS)
-   ↓ (Événements UI / @FXML)
+View (src/main/resources/view/*.fxml + style.css)
+   ↓
 Controller (controller.*Controleur)
-   ↓ (Injection de dépendances via AppContext)
-Service (service.*Service — Règles métier, zéro import JavaFX, zéro SQL)
-   ↓ (Injection par constructeur des interfaces DAO)
-DAO Interface (dao.IDAO<T>, dao.I*DAO)
-   ↓ (Implémentation concrète JDBC)
-DAO Impl JDBC/PostgreSQL (dao.impl.*DAOImpl — PreparedStatement / CallableStatement)
-   ↓ (DatabaseConnection.getConnection())
-PostgreSQL (Base projetcinetrackv2 — 8 tables, Triggers & Procédures Stockées)
+   ↓
+Service (service.*Service)
+   ↓
+DAO Interface (dao.*Dao)
+   ↓
+DAO Impl JDBC (impl.*DaoImpl)
+   ↓
+DatabaseConnection -> PostgreSQL (cinetrack_groupe3 — 8 tables)
 ```
 
----
+## 2. Structure du projet
 
-## 2. Structure du Projet (`CINETRACK_GROUPE_3`)
+- `src/main/java/main/` : `Main.java`, `TestArchitectureMVC.java`
+- `src/main/java/database/` : `DatabaseConnection.java`
+- `src/main/java/model/` : `Utilisateur`, `Film`, `Salle`, `Seance`, `Client`, `Tarif`, `Reservation`, `LogSecurite`
+- `src/main/java/dao/` : interfaces `ClientDao`, `FilmDao`, `SalleDao`, `SeanceDao`, `TarifDao`, `ReservationDao`, `UtilisateurDao`, `LogSecuriteDao`
+- `src/main/java/impl/` : implémentations JDBC (`ClientDaoImpl`, `FilmDaoImpl`, `SalleDaoImpl`, `SeanceDaoImpl`, `TarifDaoImpl`, `ReservationDaoImpl`, `UtilisateurDaoImpl`, `LogSecuriteDaoImpl`)
+- `src/main/java/service/` : `AuthentificationService`, `BilletterieService`, `ProgrammationService`, `StatistiqueEtSauvegardeService`, `ExportService`
+- `src/main/java/controller/` : `AuthentificationControleur`, `DashboardControleur`, `BilletterieControleur`, `ProgrammationControleur`, `StatistiqueControleur`
+- `src/main/java/exceptions/` : `CineTrackException`, `AuthentificationException`, `CompteBloqueException`, `ConflitHoraireException`, `PlaceIndisponibleException`
+- `src/main/resources/view/` : `login-view.fxml`, `dashboard-view.fxml`, `billetterie-view.fxml`, `programmation-view.fxml`, `statistiques-view.fxml`
+- `src/main/resources/css/style.css` : feuille de style CSS
+- `src/test/java/service/CineTrackArchitectureTest.java` : tests JUnit 5
 
-- `pom.xml` : Configuration Maven (`javafx-controls`, `javafx-fxml`, `postgresql`, `junit-jupiter`).
-- `src/main/java/main/` :
-  - `Main.java` : Point d'entrée JavaFX.
-  - `AppContext.java` : Conteneur d'Injection de Dépendances (assemble `DAO Impl` → `DAO Interface` → `Service` → `Controller`).
-  - `TestArchitectureMVC.java` : Vérification complète de la chaîne MVC + PostgreSQL.
-- `src/main/java/database/DatabaseConnection.java` : Connexion centralisée JDBC PostgreSQL.
-- `src/main/java/model/` : Les **8 entités métier** correspondant aux 8 tables PostgreSQL (`Utilisateur`, `Film`, `Salle`, `Seance`, `Client`, `Tarif`, `Reservation`, `LogSecurite`).
-- `src/main/java/dao/` : **Interfaces DAO** (`IDAO<T>`, `IUtilisateurDAO`, `IFilmDAO`, `ISalleDAO`, `ISeanceDAO`, `IClientDAO`, `ITarifDAO`, `IReservationDAO`, `ILogSecuriteDAO`).
-- `src/main/java/dao/impl/` : **Implémentations JDBC/PostgreSQL** (`UtilisateurDAOImpl`, `FilmDAOImpl`, `SalleDAOImpl`, `SeanceDAOImpl`, `ClientDAOImpl`, `TarifDAOImpl`, `ReservationDAOImpl`, `LogSecuriteDAOImpl`).
-- `src/main/java/service/` : **Couche Service Métier** (`AuthentificationService`, `ProgrammationService`, `BilletterieService`, `StatistiqueEtSauvegardeService`, `IExportService`).
-- `src/main/java/controller/` : **Contrôleurs JavaFX** (`AuthentificationControleur`, `DashboardControleur`, `BilletterieControleur`, `ProgrammationControleur`, `StatistiqueControleur`).
-- `src/main/java/exceptions/` : Hiérarchie d'exceptions métier (`CineTrackException`, `ConflitHoraireException`, `PlaceIndisponibleException`, `AuthentificationException`, `CompteBloqueException`).
-- `src/main/resources/view/` : Vues **FXML** (`login-view.fxml`, `dashboard-view.fxml`, `billetterie-view.fxml`, `programmation-view.fxml`, `statistiques-view.fxml`).
-- `src/main/resources/css/style.css` : Feuille de style **CSS** harmonisant l'interface.
-- `src/test/java/service/CineTrackArchitectureTest.java` : Tests unitaires **JUnit 5**.
-
----
-
-## 3. Comptes de Test (3 Rôles Internes)
-
-| Rôle | Login | Mot de passe | Droits d'accès |
-| :--- | :--- | :--- | :--- |
-| **Caissier** | `caissier1` | `caissier123` | Billetterie, Réservations, Billets uniques, Annulations, Fiches Clients, Consultation du planning |
-| **Manager** *(hérite de Caissier)* | `manager1` | `manager123` | + Catalogue des Films, Salles, Programmation des Séances (détection conflits), Grilles Tarifaires, Statistiques & Export CSV |
-| **Administrateur** *(hérite de Manager)* | `admin` | `admin123` | + Gestion des Utilisateurs, Déblocage de comptes (3 tentatives), Journal d'audit `logs_securite` (CC4) & Sauvegarde BDD |
-
----
-
-## 4. Lancement de l'Application
+## 3. Lancement
 
 ```bash
 mvn clean javafx:run
 ```
 
-Pour exécuter les tests unitaires JUnit 5 :
+Tests unitaires :
+
 ```bash
 mvn test
 ```

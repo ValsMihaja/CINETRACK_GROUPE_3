@@ -15,160 +15,159 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox spacing="12.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="controller.ProgrammationControleur">
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controller.ProgrammationControleur"
+      spacing="14">
 
-    <HBox spacing="12.0" alignment="CENTER_LEFT">
-        <Label text="Catalogue des Films, Salles, Programmation des Séances &amp; Grilles Tarifaires" styleClass="section-title"/>
-        <Label fx:id="lblMessageProg" text=""/>
+    <HBox alignment="CENTER_LEFT" spacing="12">
+        <Label text="Films, Salles et Séances" styleClass="page-title" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+        <Button text="Actualiser" onAction="#rafraichirTout" styleClass="btn-secondary"/>
     </HBox>
 
-    <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+    <Label fx:id="lblMessageProg" text="" wrapText="true"/>
 
-        <!-- ONGLET 1 : PROGRAMMATION DES SÉANCES & PLANNING -->
-        <Tab text="📅 Planning &amp; Programmation des Séances">
-            <VBox spacing="10.0">
+    <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+        <Tab text="Séances">
+            <VBox spacing="12">
                 <padding>
-                    <Insets top="12.0" right="4.0" bottom="4.0" left="4.0"/>
+                    <Insets top="12"/>
                 </padding>
 
-                <!-- Programmation d'une nouvelle séance (Manager / Admin) -->
-                <HBox styleClass="card" spacing="10.0" alignment="CENTER_LEFT">
-                    <Label text="Programmer :" style="-fx-font-weight: bold;"/>
-                    <ComboBox fx:id="cbSeanceFilm" promptText="Film..." prefWidth="220.0"/>
-                    <ComboBox fx:id="cbSeanceSalle" promptText="Salle..." prefWidth="180.0"/>
-                    <DatePicker fx:id="dpSeanceDate" prefWidth="135.0"/>
-                    <TextField fx:id="txtSeanceHeure" promptText="HH:mm" prefWidth="80.0"/>
-                    <Button fx:id="btnProgrammerSeance" text="Ajouter Séance" onAction="#onProgrammerSeance" styleClass="btn-primary"/>
-                    <Button fx:id="btnSupprimerSeance" text="Supprimer" onAction="#onSupprimerSeance" styleClass="btn-danger"/>
-                </HBox>
+                <VBox spacing="10" styleClass="card">
+                    <Label text="Programmer une séance" styleClass="section-title"/>
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <ComboBox fx:id="cbSeanceFilm" promptText="Film" prefWidth="220"/>
+                        <ComboBox fx:id="cbSeanceSalle" promptText="Salle" prefWidth="160"/>
+                        <DatePicker fx:id="dpSeanceDate" prefWidth="140"/>
+                        <TextField fx:id="txtSeanceHeure" promptText="HH:mm" prefWidth="90"/>
+                        <Button fx:id="btnProgrammerSeance" text="Programmer" onAction="#onProgrammerSeance" styleClass="btn-primary"/>
+                        <Button fx:id="btnSupprimerSeance" text="Supprimer" onAction="#onSupprimerSeance" styleClass="btn-danger"/>
+                    </HBox>
+                </VBox>
 
-                <!-- Barre de recherche multicritères (Jour / Salle / Film) -->
-                <HBox styleClass="card" spacing="10.0" alignment="CENTER_LEFT">
-                    <Label text="Filtrer le planning :"/>
-                    <DatePicker fx:id="dpFiltreDate" promptText="Par date" prefWidth="140.0"/>
-                    <ComboBox fx:id="cbFiltreSalle" promptText="Par salle" prefWidth="180.0"/>
-                    <ComboBox fx:id="cbFiltreFilm" promptText="Par film" prefWidth="220.0"/>
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Label text="Filtres :" styleClass="field-label"/>
+                    <DatePicker fx:id="dpFiltreDate" promptText="Date" prefWidth="135"/>
+                    <ComboBox fx:id="cbFiltreSalle" promptText="Salle" prefWidth="150"/>
+                    <ComboBox fx:id="cbFiltreFilm" promptText="Film" prefWidth="200"/>
                     <Button text="Filtrer" onAction="#onFiltrerSeances" styleClass="btn-secondary"/>
-                    <Button text="Tout afficher" onAction="#onReinitialiserFiltresSeances" styleClass="btn-secondary"/>
+                    <Button text="Réinitialiser" onAction="#onReinitialiserFiltresSeances" styleClass="btn-secondary"/>
                 </HBox>
 
                 <TableView fx:id="tableSeances" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="colIdSeance" text="ID" prefWidth="55.0"/>
-                        <TableColumn fx:id="colFilmSeance" text="Film programmé" prefWidth="250.0"/>
-                        <TableColumn fx:id="colSalleSeance" text="Salle de projection" prefWidth="170.0"/>
-                        <TableColumn fx:id="colDateSeance" text="Date" prefWidth="120.0"/>
-                        <TableColumn fx:id="colHeureSeance" text="Créneau (Début -&gt; Fin)" prefWidth="170.0"/>
-                        <TableColumn fx:id="colPlacesSeance" text="Places disponibles" prefWidth="130.0"/>
+                        <TableColumn fx:id="colIdSeance" text="ID" prefWidth="60"/>
+                        <TableColumn fx:id="colFilmSeance" text="Film" prefWidth="250"/>
+                        <TableColumn fx:id="colSalleSeance" text="Salle" prefWidth="140"/>
+                        <TableColumn fx:id="colDateSeance" text="Date" prefWidth="110"/>
+                        <TableColumn fx:id="colHeureSeance" text="Horaire" prefWidth="140"/>
+                        <TableColumn fx:id="colPlacesSeance" text="Places dispo" prefWidth="110"/>
                     </columns>
-                    <columnResizePolicy>
-                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
-                    </columnResizePolicy>
                 </TableView>
             </VBox>
         </Tab>
 
-        <!-- ONGLET 2 : CATALOGUE DES FILMS -->
-        <Tab text="🎬 Catalogue des Films">
-            <VBox spacing="10.0">
+        <Tab text="Films">
+            <VBox spacing="12">
                 <padding>
-                    <Insets top="12.0" right="4.0" bottom="4.0" left="4.0"/>
+                    <Insets top="12"/>
                 </padding>
 
-                <VBox styleClass="card" spacing="8.0">
-                    <HBox spacing="10.0" alignment="CENTER_LEFT">
-                        <TextField fx:id="txtFilmTitre" promptText="Titre du film *" prefWidth="220.0"/>
-                        <TextField fx:id="txtFilmGenre" promptText="Genre (Action, Drame...) *" prefWidth="160.0"/>
-                        <TextField fx:id="txtFilmDuree" promptText="Durée (min) *" prefWidth="110.0"/>
-                        <TextField fx:id="txtFilmNote" promptText="Note (0-10)" prefWidth="95.0"/>
-                        <Button fx:id="btnAjouterFilm" text="Ajouter" onAction="#onAjouterFilm" styleClass="btn-primary"/>
-                        <Button fx:id="btnModifierFilm" text="Modifier" onAction="#onModifierFilm" styleClass="btn-gold"/>
-                        <Button fx:id="btnSupprimerFilm" text="Supprimer" onAction="#onSupprimerFilm" styleClass="btn-danger"/>
+                <VBox spacing="10" styleClass="card">
+                    <Label text="Fiche film" styleClass="section-title"/>
+                    <HBox spacing="10">
+                        <TextField fx:id="txtFilmTitre" promptText="Titre" HBox.hgrow="ALWAYS"/>
+                        <TextField fx:id="txtFilmGenre" promptText="Genre" prefWidth="160"/>
+                        <TextField fx:id="txtFilmDuree" promptText="Durée (min)" prefWidth="110"/>
+                        <TextField fx:id="txtFilmNote" promptText="Note (0-10)" prefWidth="100"/>
                     </HBox>
-                    <HBox spacing="10.0" alignment="CENTER_LEFT">
-                        <TextArea fx:id="txtFilmSynopsis" promptText="Synopsis du film..." prefRowCount="2" HBox.hgrow="ALWAYS"/>
-                        <TextField fx:id="txtRechercheFilmTitre" promptText="Rechercher titre..." prefWidth="150.0"/>
-                        <TextField fx:id="txtRechercheFilmGenre" promptText="Filtrer genre..." prefWidth="130.0"/>
-                        <Button text="Rechercher" onAction="#onRechercherFilms" styleClass="btn-secondary"/>
+                    <TextArea fx:id="txtFilmSynopsis" promptText="Synopsis" prefHeight="60"/>
+                    <HBox spacing="10">
+                        <Button fx:id="btnAjouterFilm" text="Ajouter" onAction="#onAjouterFilm" styleClass="btn-primary"/>
+                        <Button fx:id="btnModifierFilm" text="Modifier" onAction="#onModifierFilm" styleClass="btn-secondary"/>
+                        <Button fx:id="btnSupprimerFilm" text="Supprimer" onAction="#onSupprimerFilm" styleClass="btn-danger"/>
                     </HBox>
                 </VBox>
 
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <TextField fx:id="txtRechercheFilmTitre" promptText="Titre" prefWidth="220"/>
+                    <TextField fx:id="txtRechercheFilmGenre" promptText="Genre" prefWidth="160"/>
+                    <Button text="Rechercher" onAction="#onRechercherFilms" styleClass="btn-secondary"/>
+                </HBox>
+
                 <TableView fx:id="tableFilms" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="colIdFilm" text="ID" prefWidth="60.0"/>
-                        <TableColumn fx:id="colTitreFilm" text="Titre" prefWidth="260.0"/>
-                        <TableColumn fx:id="colGenreFilm" text="Genre" prefWidth="150.0"/>
-                        <TableColumn fx:id="colDureeFilm" text="Durée (min)" prefWidth="110.0"/>
-                        <TableColumn fx:id="colNoteFilm" text="Note / 10" prefWidth="100.0"/>
+                        <TableColumn fx:id="colIdFilm" text="ID" prefWidth="60"/>
+                        <TableColumn fx:id="colTitreFilm" text="Titre" prefWidth="260"/>
+                        <TableColumn fx:id="colGenreFilm" text="Genre" prefWidth="150"/>
+                        <TableColumn fx:id="colDureeFilm" text="Durée (min)" prefWidth="110"/>
+                        <TableColumn fx:id="colNoteFilm" text="Note" prefWidth="90"/>
                     </columns>
-                    <columnResizePolicy>
-                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
-                    </columnResizePolicy>
                 </TableView>
             </VBox>
         </Tab>
 
-        <!-- ONGLET 3 : SALLES DE PROJECTION -->
-        <Tab text="🏛 Salles de Projection">
-            <VBox spacing="10.0">
+        <Tab text="Salles">
+            <VBox spacing="12">
                 <padding>
-                    <Insets top="12.0" right="4.0" bottom="4.0" left="4.0"/>
+                    <Insets top="12"/>
                 </padding>
 
-                <HBox styleClass="card" spacing="10.0" alignment="CENTER_LEFT">
-                    <TextField fx:id="txtSalleNom" promptText="Nom de la salle *" prefWidth="200.0"/>
-                    <TextField fx:id="txtSalleCapacite" promptText="Capacité (places) *" prefWidth="140.0"/>
-                    <TextField fx:id="txtSalleEquipement" promptText="Équipement (4K, Dolby Atmos...)" prefWidth="260.0"/>
-                    <Button fx:id="btnAjouterSalle" text="Ajouter" onAction="#onAjouterSalle" styleClass="btn-primary"/>
-                    <Button fx:id="btnModifierSalle" text="Modifier" onAction="#onModifierSalle" styleClass="btn-gold"/>
-                    <Button fx:id="btnSupprimerSalle" text="Supprimer" onAction="#onSupprimerSalle" styleClass="btn-danger"/>
-                </HBox>
+                <VBox spacing="10" styleClass="card">
+                    <Label text="Gestion des salles" styleClass="section-title"/>
+                    <HBox spacing="10">
+                        <TextField fx:id="txtSalleNom" promptText="Nom de la salle" HBox.hgrow="ALWAYS"/>
+                        <TextField fx:id="txtSalleCapacite" promptText="Capacité" prefWidth="120"/>
+                        <TextField fx:id="txtSalleEquipement" promptText="Équipement" HBox.hgrow="ALWAYS"/>
+                    </HBox>
+                    <HBox spacing="10">
+                        <Button fx:id="btnAjouterSalle" text="Ajouter" onAction="#onAjouterSalle" styleClass="btn-primary"/>
+                        <Button fx:id="btnModifierSalle" text="Modifier" onAction="#onModifierSalle" styleClass="btn-secondary"/>
+                        <Button fx:id="btnSupprimerSalle" text="Supprimer" onAction="#onSupprimerSalle" styleClass="btn-danger"/>
+                    </HBox>
+                </VBox>
 
                 <TableView fx:id="tableSalles" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="colIdSalle" text="ID" prefWidth="60.0"/>
-                        <TableColumn fx:id="colNomSalle" text="Nom de la Salle" prefWidth="220.0"/>
-                        <TableColumn fx:id="colCapaciteSalle" text="Capacité (Places)" prefWidth="150.0"/>
-                        <TableColumn fx:id="colEquipementSalle" text="Équipement Technique" prefWidth="320.0"/>
+                        <TableColumn fx:id="colIdSalle" text="ID" prefWidth="60"/>
+                        <TableColumn fx:id="colNomSalle" text="Nom" prefWidth="200"/>
+                        <TableColumn fx:id="colCapaciteSalle" text="Capacité" prefWidth="120"/>
+                        <TableColumn fx:id="colEquipementSalle" text="Équipement" prefWidth="320"/>
                     </columns>
-                    <columnResizePolicy>
-                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
-                    </columnResizePolicy>
                 </TableView>
             </VBox>
         </Tab>
 
-        <!-- ONGLET 4 : GRILLES TARIFAIRES -->
-        <Tab text="💳 Grilles Tarifaires">
-            <VBox spacing="10.0">
+        <Tab text="Tarifs">
+            <VBox spacing="12">
                 <padding>
-                    <Insets top="12.0" right="4.0" bottom="4.0" left="4.0"/>
+                    <Insets top="12"/>
                 </padding>
 
-                <HBox styleClass="card" spacing="10.0" alignment="CENTER_LEFT">
-                    <TextField fx:id="txtTarifCategorie" editable="false" promptText="Catégorie" prefWidth="150.0"/>
-                    <TextField fx:id="txtTarifLibelle" promptText="Libellé *" prefWidth="170.0"/>
-                    <TextField fx:id="txtTarifPrix" promptText="Prix unitaire (Rs) *" prefWidth="130.0"/>
-                    <TextField fx:id="txtTarifDescription" promptText="Description" prefWidth="250.0"/>
-                    <CheckBox fx:id="chkTarifActif" text="Actif" selected="true"/>
-                    <Button fx:id="btnModifierTarif" text="Mettre à jour le tarif" onAction="#onModifierTarif" styleClass="btn-gold"/>
-                </HBox>
+                <VBox spacing="10" styleClass="card">
+                    <Label text="Modifier un tarif" styleClass="section-title"/>
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <TextField fx:id="txtTarifCategorie" editable="false" promptText="Catégorie" prefWidth="150"/>
+                        <TextField fx:id="txtTarifLibelle" promptText="Libellé" prefWidth="180"/>
+                        <TextField fx:id="txtTarifPrix" promptText="Prix (Rs)" prefWidth="100"/>
+                        <TextField fx:id="txtTarifDescription" promptText="Description" HBox.hgrow="ALWAYS"/>
+                        <CheckBox fx:id="chkTarifActif" text="Actif"/>
+                        <Button fx:id="btnModifierTarif" text="Enregistrer" onAction="#onModifierTarif" styleClass="btn-primary"/>
+                    </HBox>
+                </VBox>
 
                 <TableView fx:id="tableTarifs" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="colIdTarif" text="ID" prefWidth="60.0"/>
-                        <TableColumn fx:id="colCatTarif" text="Code Catégorie" prefWidth="160.0"/>
-                        <TableColumn fx:id="colLibelleTarif" text="Libellé" prefWidth="180.0"/>
-                        <TableColumn fx:id="colPrixTarif" text="Prix Unitaire" prefWidth="130.0"/>
-                        <TableColumn fx:id="colDescTarif" text="Conditions / Description" prefWidth="320.0"/>
+                        <TableColumn fx:id="colIdTarif" text="ID" prefWidth="60"/>
+                        <TableColumn fx:id="colCatTarif" text="Catégorie" prefWidth="150"/>
+                        <TableColumn fx:id="colLibelleTarif" text="Libellé" prefWidth="170"/>
+                        <TableColumn fx:id="colPrixTarif" text="Prix unitaire" prefWidth="120"/>
+                        <TableColumn fx:id="colDescTarif" text="Description" prefWidth="320"/>
                     </columns>
-                    <columnResizePolicy>
-                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
-                    </columnResizePolicy>
                 </TableView>
             </VBox>
         </Tab>
-
     </TabPane>
+
 </VBox>

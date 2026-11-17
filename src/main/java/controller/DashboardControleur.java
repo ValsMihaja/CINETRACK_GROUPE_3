@@ -1,30 +1,18 @@
 package controller;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
-import main.AppContext;
 import main.Main;
 import model.Utilisateur;
 import service.AuthentificationService;
-import service.StatistiqueEtSauvegardeService;
 
 import java.io.IOException;
 import java.sql.SQLException;
 
-/**
- * ====================================================================
- * COUCHE : CONTROLLER (Tableau de Bord Principal & Navigation par Rôle)
- * ====================================================================
- * RÔLE :
- * Contrôle la fenêtre principale (dashboard-view.fxml), applique les droits
- * d'accès selon l'héritage des acteurs :
- * - CAISSIER : Billetterie, Réservations, Clients, Consultation du planning
- * - MANAGER (hérite de Caissier) : + Films, Salles, Programmation Séances, Tarifs, Statistiques
- * - ADMIN (hérite de Manager) : + Gestion des Utilisateurs, Logs de sécurité, Sauvegarde BDD
- */
 public class DashboardControleur {
 
     @FXML
@@ -45,37 +33,16 @@ public class DashboardControleur {
     @FXML
     private StackPane contentPane;
 
-    private final AuthentificationService authentificationService;
-    private final StatistiqueEtSauvegardeService statistiqueService;
-
-    public DashboardControleur(AuthentificationService authentificationService,
-                               StatistiqueEtSauvegardeService statistiqueService) {
-        this.authentificationService = authentificationService;
-        this.statistiqueService = statistiqueService;
-    }
-
-    public DashboardControleur() {
-        this(
-                AppContext.getInstance().getAuthentificationService(),
-                AppContext.getInstance().getStatistiqueService()
-        );
-    }
+    private final AuthentificationService authService = new AuthentificationService();
 
     @FXML
     public void initialize() {
-        Utilisateur u = authentificationService.getUtilisateurConnecte();
+        Utilisateur u = authService.getUtilisateurConnecte();
         if (u != null) {
-            lblUtilisateurConnecte.setText(u.getNomComplet() + " (@" + u.getLogin() + ")");
+            lblUtilisateurConnecte.setText(u.getNomComplet());
             lblRoleBadge.setText(u.getRole());
-
-            // Gestion des droits d'accès selon le rôle :
-            // Le Caissier a accès à la Billetterie et à la consultation du programme,
-            // tandis que les statistiques/administration sont réservées au Manager et à l'Admin.
-            boolean estManagerOuAdmin = u.estManagerOuPlus();
-            btnNavStatistiques.setDisable(!estManagerOuAdmin);
+            btnNavStatistiques.setDisable(!u.estManagerOuPlus());
         }
-
-        // Afficher l'écran de Billetterie par défaut au démarrage
         onAfficherBilletterie();
     }
 
@@ -97,7 +64,7 @@ public class DashboardControleur {
     @FXML
     private void onSeDeconnecter() {
         try {
-            authentificationService.deconnecter();
+            authService.deconnecter();
         } catch (SQLException ignored) {
         }
         Main.afficherEcranConnexion();
@@ -105,7 +72,7 @@ public class DashboardControleur {
 
     private void chargerSousVue(String fxmlPath, Button boutonActif) {
         try {
-            Parent vue = AppContext.getInstance().chargerVue(fxmlPath);
+            Parent vue = FXMLLoader.load(getClass().getResource(fxmlPath));
             contentPane.getChildren().setAll(vue);
 
             btnNavBilletterie.getStyleClass().remove("nav-btn-active");

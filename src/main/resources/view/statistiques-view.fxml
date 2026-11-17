@@ -11,135 +11,113 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Priority?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox spacing="12.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="controller.StatistiqueControleur">
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controller.StatistiqueControleur"
+      spacing="14">
 
-    <HBox spacing="12.0" alignment="CENTER_LEFT">
-        <Label text="Pilotage Statistique (Manager) &amp; Administration Sécurité CC4 (Admin)" styleClass="section-title"/>
-        <Label fx:id="lblMessageStats" text=""/>
+    <HBox alignment="CENTER_LEFT" spacing="12">
+        <Label text="Statistiques et Administration" styleClass="page-title" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+        <Button text="Exporter CSV" onAction="#onExporterRapportCSV" styleClass="btn-primary"/>
+        <Button text="Actualiser" onAction="#rafraichirStatistiques" styleClass="btn-secondary"/>
     </HBox>
 
-    <!-- Bandeau d'indicateurs clés (KPI) -->
-    <HBox spacing="14.0">
-        <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
-            <Label text="CHIFFRE D'AFFAIRES CONFIRMÉ" styleClass="kpi-title"/>
-            <Label fx:id="lblKpiChiffreAffaires" text="0.00 Rs" styleClass="kpi-value"/>
-        </VBox>
-        <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
-            <Label text="TOTAL PLACES VENDUES" styleClass="kpi-title"/>
-            <Label fx:id="lblKpiBilletsVendus" text="0" styleClass="kpi-value"/>
-        </VBox>
-        <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
-            <Label text="RÉSERVATIONS ACTIVES" styleClass="kpi-title"/>
-            <Label fx:id="lblKpiReservations" text="0" styleClass="kpi-value"/>
-        </VBox>
-        <VBox spacing="8.0" alignment="CENTER">
-            <Button text="📥 Exporter Rapport CSV" onAction="#onExporterRapportCSV" styleClass="btn-gold"/>
-            <Button text="🔄 Actualiser" onAction="#rafraichirStatistiques" styleClass="btn-secondary"/>
-        </VBox>
-    </HBox>
+    <Label fx:id="lblMessageStats" text="" wrapText="true"/>
 
     <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
-
-        <!-- ONGLET 1 : TOP FILMS & TAUX D'OCCUPATION (Manager & Admin) -->
-        <Tab text="📈 Statistiques d'Exploitation (Top Films &amp; Taux d'Occupation)">
-            <HBox spacing="12.0">
+        <Tab text="Statistiques">
+            <VBox spacing="14">
                 <padding>
-                    <Insets top="12.0" right="4.0" bottom="4.0" left="4.0"/>
+                    <Insets top="12"/>
                 </padding>
 
-                <VBox spacing="8.0" HBox.hgrow="ALWAYS">
-                    <Label text="Films les plus réservés &amp; Chiffre d'affaires par film" styleClass="section-title"/>
-                    <TableView fx:id="tableTopFilms" VBox.vgrow="ALWAYS">
-                        <columns>
-                            <TableColumn fx:id="colTopTitre" text="Film" prefWidth="180.0"/>
-                            <TableColumn fx:id="colTopGenre" text="Genre" prefWidth="110.0"/>
-                            <TableColumn fx:id="colTopNote" text="Note" prefWidth="75.0"/>
-                            <TableColumn fx:id="colTopPlaces" text="Places Vendues" prefWidth="105.0"/>
-                            <TableColumn fx:id="colTopCA" text="CA Généré" prefWidth="110.0"/>
-                        </columns>
-                        <columnResizePolicy>
-                            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
-                        </columnResizePolicy>
-                    </TableView>
-                </VBox>
-
-                <VBox spacing="8.0" HBox.hgrow="ALWAYS">
-                    <Label text="Taux d'occupation par salle et par séance" styleClass="section-title"/>
-                    <TableView fx:id="tableOccupation" VBox.vgrow="ALWAYS">
-                        <columns>
-                            <TableColumn fx:id="colOccDate" text="Date" prefWidth="95.0"/>
-                            <TableColumn fx:id="colOccHeure" text="Heure" prefWidth="75.0"/>
-                            <TableColumn fx:id="colOccSalle" text="Salle" prefWidth="115.0"/>
-                            <TableColumn fx:id="colOccFilm" text="Film" prefWidth="150.0"/>
-                            <TableColumn fx:id="colOccPlaces" text="Occupées / Cap." prefWidth="105.0"/>
-                            <TableColumn fx:id="colOccTaux" text="Occupation" prefWidth="85.0"/>
-                        </columns>
-                        <columnResizePolicy>
-                            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
-                        </columnResizePolicy>
-                    </TableView>
-                </VBox>
-            </HBox>
-        </Tab>
-
-        <!-- ONGLET 2 : ADMINISTRATION UTILISATEURS, LOGS SÉCURITÉ & SAUVEGARDE (Admin uniquement) -->
-        <Tab fx:id="tabAdministration" text="🛡 Administration, Comptes &amp; Logs de Sécurité (CC4)">
-            <VBox spacing="10.0">
-                <padding>
-                    <Insets top="12.0" right="4.0" bottom="4.0" left="4.0"/>
-                </padding>
-
-                <HBox styleClass="card" spacing="10.0" alignment="CENTER_LEFT">
-                    <TextField fx:id="txtUserLogin" promptText="Login *" prefWidth="130.0"/>
-                    <PasswordField fx:id="txtUserMdp" promptText="Mot de passe *" prefWidth="140.0"/>
-                    <TextField fx:id="txtUserNom" promptText="Nom *" prefWidth="130.0"/>
-                    <TextField fx:id="txtUserPrenom" promptText="Prénom" prefWidth="130.0"/>
-                    <ComboBox fx:id="cbUserRole" prefWidth="130.0"/>
-                    <Button text="Créer Compte" onAction="#onCreerUtilisateur" styleClass="btn-primary"/>
-                    <Button text="Débloquer Compte (0/3)" onAction="#onDebloquerUtilisateur" styleClass="btn-gold"/>
-                    <Button text="Supprimer" onAction="#onSupprimerUtilisateur" styleClass="btn-danger"/>
-                    <Button fx:id="btnSauvegardeBdd" text="💾 Sauvegarde BDD" onAction="#onExecuterSauvegarde" styleClass="btn-secondary"/>
-                </HBox>
-
-                <HBox spacing="12.0" VBox.vgrow="ALWAYS">
-                    <VBox spacing="6.0" prefWidth="480.0">
-                        <Label text="Comptes du Personnel Interne (utilisateurs)" styleClass="section-title"/>
-                        <TableView fx:id="tableUtilisateurs" VBox.vgrow="ALWAYS">
-                            <columns>
-                                <TableColumn fx:id="colUserId" text="ID" prefWidth="45.0"/>
-                                <TableColumn fx:id="colUserLogin" text="Login" prefWidth="105.0"/>
-                                <TableColumn fx:id="colUserNomComplet" text="Nom Complet" prefWidth="140.0"/>
-                                <TableColumn fx:id="colUserRole" text="Rôle" prefWidth="95.0"/>
-                                <TableColumn fx:id="colUserStatut" text="Statut Sécurité" prefWidth="110.0"/>
-                            </columns>
-                            <columnResizePolicy>
-                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
-                            </columnResizePolicy>
-                        </TableView>
+                <HBox spacing="14">
+                    <VBox spacing="4" styleClass="kpi-card" HBox.hgrow="ALWAYS">
+                        <Label text="Chiffre d'affaires" styleClass="kpi-label"/>
+                        <Label fx:id="lblKpiChiffreAffaires" text="0.00 Rs" styleClass="kpi-value"/>
                     </VBox>
-
-                    <VBox spacing="6.0" HBox.hgrow="ALWAYS">
-                        <Label text="Journal d'Audit et de Cybersécurité (logs_securite - CC4)" styleClass="section-title"/>
-                        <TableView fx:id="tableLogs" VBox.vgrow="ALWAYS">
-                            <columns>
-                                <TableColumn fx:id="colLogId" text="ID" prefWidth="50.0"/>
-                                <TableColumn fx:id="colLogDate" text="Date &amp; Heure" prefWidth="135.0"/>
-                                <TableColumn fx:id="colLogUser" text="Utilisateur" prefWidth="95.0"/>
-                                <TableColumn fx:id="colLogAction" text="Action" prefWidth="155.0"/>
-                                <TableColumn fx:id="colLogDetails" text="Données Concernées" prefWidth="280.0"/>
-                            </columns>
-                            <columnResizePolicy>
-                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
-                            </columnResizePolicy>
-                        </TableView>
+                    <VBox spacing="4" styleClass="kpi-card" HBox.hgrow="ALWAYS">
+                        <Label text="Billets vendus" styleClass="kpi-label"/>
+                        <Label fx:id="lblKpiBilletsVendus" text="0" styleClass="kpi-value"/>
+                    </VBox>
+                    <VBox spacing="4" styleClass="kpi-card" HBox.hgrow="ALWAYS">
+                        <Label text="Réservations confirmées" styleClass="kpi-label"/>
+                        <Label fx:id="lblKpiReservations" text="0" styleClass="kpi-value"/>
                     </VBox>
                 </HBox>
+
+                <Label text="Films les plus réservés" styleClass="section-title"/>
+                <TableView fx:id="tableTopFilms" prefHeight="180">
+                    <columns>
+                        <TableColumn fx:id="colTopTitre" text="Titre" prefWidth="250"/>
+                        <TableColumn fx:id="colTopGenre" text="Genre" prefWidth="140"/>
+                        <TableColumn fx:id="colTopNote" text="Note" prefWidth="100"/>
+                        <TableColumn fx:id="colTopPlaces" text="Places vendues" prefWidth="130"/>
+                        <TableColumn fx:id="colTopCA" text="Chiffre d'affaires" prefWidth="160"/>
+                    </columns>
+                </TableView>
+
+                <Label text="Taux d'occupation par séance" styleClass="section-title"/>
+                <TableView fx:id="tableOccupation" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colOccDate" text="Date" prefWidth="105"/>
+                        <TableColumn fx:id="colOccHeure" text="Heure" prefWidth="85"/>
+                        <TableColumn fx:id="colOccSalle" text="Salle" prefWidth="140"/>
+                        <TableColumn fx:id="colOccFilm" text="Film" prefWidth="230"/>
+                        <TableColumn fx:id="colOccPlaces" text="Occupation" prefWidth="120"/>
+                        <TableColumn fx:id="colOccTaux" text="Taux" prefWidth="90"/>
+                    </columns>
+                </TableView>
             </VBox>
         </Tab>
 
+        <Tab fx:id="tabAdministration" text="Administration">
+            <VBox spacing="14">
+                <padding>
+                    <Insets top="12"/>
+                </padding>
+
+                <VBox spacing="10" styleClass="card">
+                    <Label text="Gestion des comptes" styleClass="section-title"/>
+                    <HBox spacing="10">
+                        <TextField fx:id="txtUserLogin" promptText="Identifiant" HBox.hgrow="ALWAYS"/>
+                        <PasswordField fx:id="txtUserMdp" promptText="Mot de passe" HBox.hgrow="ALWAYS"/>
+                        <TextField fx:id="txtUserNom" promptText="Nom" HBox.hgrow="ALWAYS"/>
+                        <TextField fx:id="txtUserPrenom" promptText="Prénom" HBox.hgrow="ALWAYS"/>
+                        <ComboBox fx:id="cbUserRole" prefWidth="130"/>
+                    </HBox>
+                    <HBox spacing="10">
+                        <Button text="Créer utilisateur" onAction="#onCreerUtilisateur" styleClass="btn-primary"/>
+                        <Button text="Débloquer" onAction="#onDebloquerUtilisateur" styleClass="btn-secondary"/>
+                        <Button text="Supprimer" onAction="#onSupprimerUtilisateur" styleClass="btn-danger"/>
+                        <Button fx:id="btnSauvegardeBdd" text="Sauvegarder BDD" onAction="#onExecuterSauvegarde" styleClass="btn-secondary"/>
+                    </HBox>
+                </VBox>
+
+                <TableView fx:id="tableUtilisateurs" prefHeight="155">
+                    <columns>
+                        <TableColumn fx:id="colUserId" text="ID" prefWidth="60"/>
+                        <TableColumn fx:id="colUserLogin" text="Identifiant" prefWidth="140"/>
+                        <TableColumn fx:id="colUserNomComplet" text="Nom complet" prefWidth="220"/>
+                        <TableColumn fx:id="colUserRole" text="Rôle" prefWidth="110"/>
+                        <TableColumn fx:id="colUserStatut" text="Statut" prefWidth="180"/>
+                    </columns>
+                </TableView>
+
+                <Label text="Logs de sécurité" styleClass="section-title"/>
+                <TableView fx:id="tableLogs" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colLogId" text="ID" prefWidth="60"/>
+                        <TableColumn fx:id="colLogDate" text="Date" prefWidth="150"/>
+                        <TableColumn fx:id="colLogUser" text="Utilisateur" prefWidth="120"/>
+                        <TableColumn fx:id="colLogAction" text="Action" prefWidth="180"/>
+                        <TableColumn fx:id="colLogDetails" text="Détails" prefWidth="360"/>
+                    </columns>
+                </TableView>
+            </VBox>
+        </Tab>
     </TabPane>
+
 </VBox>

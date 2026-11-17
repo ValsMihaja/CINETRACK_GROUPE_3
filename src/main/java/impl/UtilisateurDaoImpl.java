@@ -1,6 +1,6 @@
-package dao.impl;
+package impl;
 
-import dao.IUtilisateurDAO;
+import dao.UtilisateurDao;
 import database.DatabaseConnection;
 import model.Utilisateur;
 
@@ -12,11 +12,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Implémentation JDBC/PostgreSQL de IUtilisateurDAO.
- * Utilise exclusivement des requêtes préparées (PreparedStatement) anti-injection SQL.
- */
-public class UtilisateurDAOImpl implements IUtilisateurDAO {
+public class UtilisateurDaoImpl implements UtilisateurDao {
 
     @Override
     public List<Utilisateur> findAll() throws SQLException {

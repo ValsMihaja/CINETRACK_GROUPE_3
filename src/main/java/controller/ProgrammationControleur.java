@@ -3,6 +3,7 @@ package controller;
 import exceptions.CineTrackException;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -14,7 +15,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import main.AppContext;
 import model.Film;
 import model.Salle;
 import model.Seance;
@@ -29,20 +29,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 
-/**
- * ====================================================================
- * COUCHE : CONTROLLER (Catalogue de Films, Salles, Séances & Tarifs)
- * ====================================================================
- * RÔLE :
- * Contrôle la vue programmation-view.fxml :
- * - Gestion CRUD des films et recherche par critères (titre, genre).
- * - Gestion CRUD des salles de projection et de leurs capacités.
- * - Programmation des séances avec détection automatique des conflits d'horaires.
- * - Gestion des grilles tarifaires (Manager / Administrateur).
- */
 public class ProgrammationControleur {
 
-    // --- Onglet Séances ---
     @FXML
     private ComboBox<Film> cbSeanceFilm;
 
@@ -91,7 +79,6 @@ public class ProgrammationControleur {
     @FXML
     private Button btnSupprimerSeance;
 
-    // --- Onglet Films ---
     @FXML
     private TextField txtFilmTitre;
 
@@ -140,7 +127,6 @@ public class ProgrammationControleur {
     @FXML
     private Button btnSupprimerFilm;
 
-    // --- Onglet Salles ---
     @FXML
     private TextField txtSalleNom;
 
@@ -174,7 +160,6 @@ public class ProgrammationControleur {
     @FXML
     private Button btnSupprimerSalle;
 
-    // --- Onglet Tarifs ---
     @FXML
     private TextField txtTarifCategorie;
 
@@ -214,38 +199,20 @@ public class ProgrammationControleur {
     @FXML
     private Label lblMessageProg;
 
-    private final ProgrammationService programmationService;
-    private final BilletterieService billetterieService;
-    private final AuthentificationService authentificationService;
-
-    public ProgrammationControleur(ProgrammationService programmationService,
-                                   BilletterieService billetterieService,
-                                   AuthentificationService authentificationService) {
-        this.programmationService = programmationService;
-        this.billetterieService = billetterieService;
-        this.authentificationService = authentificationService;
-    }
-
-    public ProgrammationControleur() {
-        this(
-                AppContext.getInstance().getProgrammationService(),
-                AppContext.getInstance().getBilletterieService(),
-                AppContext.getInstance().getAuthentificationService()
-        );
-    }
+    private final ProgrammationService programmationService = new ProgrammationService();
+    private final BilletterieService billetterieService = new BilletterieService();
+    private final AuthentificationService authService = new AuthentificationService();
 
     @FXML
     public void initialize() {
-        // Configuration TableView Séances
         colIdSeance.setCellValueFactory(new PropertyValueFactory<>("idSeance"));
         colFilmSeance.setCellValueFactory(new PropertyValueFactory<>("titreFilm"));
         colSalleSeance.setCellValueFactory(new PropertyValueFactory<>("nomSalle"));
         colDateSeance.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getDateSeance().toString()));
         colHeureSeance.setCellValueFactory(cell -> new SimpleStringProperty(
-                cell.getValue().getHeure() + " -> " + cell.getValue().getHeureFin()));
+                cell.getValue().getHeure() + " - " + cell.getValue().getHeureFin()));
         colPlacesSeance.setCellValueFactory(new PropertyValueFactory<>("placesDispo"));
 
-        // Configuration TableView Films
         colIdFilm.setCellValueFactory(new PropertyValueFactory<>("idFilm"));
         colTitreFilm.setCellValueFactory(new PropertyValueFactory<>("titre"));
         colGenreFilm.setCellValueFactory(new PropertyValueFactory<>("genre"));
@@ -262,7 +229,6 @@ public class ProgrammationControleur {
             }
         });
 
-        // Configuration TableView Salles
         colIdSalle.setCellValueFactory(new PropertyValueFactory<>("idSalle"));
         colNomSalle.setCellValueFactory(new PropertyValueFactory<>("nom"));
         colCapaciteSalle.setCellValueFactory(new PropertyValueFactory<>("capacite"));
@@ -276,7 +242,6 @@ public class ProgrammationControleur {
             }
         });
 
-        // Configuration TableView Tarifs
         colIdTarif.setCellValueFactory(new PropertyValueFactory<>("idTarif"));
         colCatTarif.setCellValueFactory(new PropertyValueFactory<>("categorie"));
         colLibelleTarif.setCellValueFactory(new PropertyValueFactory<>("libelle"));
@@ -302,7 +267,7 @@ public class ProgrammationControleur {
     }
 
     private void appliquerDroitsSelonRole() {
-        Utilisateur u = authentificationService.getUtilisateurConnecte();
+        Utilisateur u = authService.getUtilisateurConnecte();
         boolean peutModifier = u != null && u.estManagerOuPlus();
 
         btnProgrammerSeance.setDisable(!peutModifier);
@@ -319,10 +284,10 @@ public class ProgrammationControleur {
     @FXML
     public void rafraichirTout() {
         try {
-            var films = FXCollections.observableArrayList(programmationService.listerFilms());
-            var salles = FXCollections.observableArrayList(programmationService.listerSalles());
-            var seances = FXCollections.observableArrayList(programmationService.listerSeances());
-            var tarifs = FXCollections.observableArrayList(billetterieService.listerTarifs());
+            ObservableList<Film> films = FXCollections.observableArrayList(programmationService.listerFilms());
+            ObservableList<Salle> salles = FXCollections.observableArrayList(programmationService.listerSalles());
+            ObservableList<Seance> seances = FXCollections.observableArrayList(programmationService.listerSeances());
+            ObservableList<Tarif> tarifs = FXCollections.observableArrayList(billetterieService.listerTarifs());
 
             tableFilms.setItems(films);
             tableSalles.setItems(salles);
@@ -334,11 +299,9 @@ public class ProgrammationControleur {
             cbFiltreFilm.setItems(films);
             cbFiltreSalle.setItems(salles);
         } catch (SQLException e) {
-            afficherMessage("Erreur lors du chargement : " + e.getMessage(), true);
+            afficherMessage("Erreur chargement : " + e.getMessage(), true);
         }
     }
-
-    // --- Actions Séances ---
 
     @FXML
     private void onProgrammerSeance() {
@@ -356,16 +319,16 @@ public class ProgrammationControleur {
         try {
             heure = LocalTime.parse(heureTexte.trim());
         } catch (DateTimeParseException e) {
-            afficherMessage("Format d'heure invalide. Utilisez HH:mm (ex: 14:30 ou 20:00).", true);
+            afficherMessage("Format d'heure invalide (HH:mm).", true);
             return;
         }
 
         try {
             programmationService.programmerSeance(film.getIdFilm(), salle.getIdSalle(), date, heure);
-            afficherMessage("Séance programmée avec succès (aucun conflit d'horaire) !", false);
+            afficherMessage("Séance programmée.", false);
             rafraichirTout();
         } catch (CineTrackException e) {
-            afficherMessage("⚠ " + e.getMessage(), true);
+            afficherMessage(e.getMessage(), true);
         } catch (SQLException e) {
             afficherMessage("Erreur SQL : " + e.getMessage(), true);
         }
@@ -381,7 +344,7 @@ public class ProgrammationControleur {
                     programmationService.rechercherSeances(date, idSalle, idFilm)
             ));
         } catch (SQLException e) {
-            afficherMessage("Erreur lors du filtrage des séances : " + e.getMessage(), true);
+            afficherMessage("Erreur filtrage : " + e.getMessage(), true);
         }
     }
 
@@ -401,15 +364,13 @@ public class ProgrammationControleur {
             return;
         }
         try {
-            programmationService.supprimerSeance(sel.getIdSeance(), authentificationService.getUtilisateurConnecte());
+            programmationService.supprimerSeance(sel.getIdSeance(), authService.getUtilisateurConnecte());
             afficherMessage("Séance #" + sel.getIdSeance() + " supprimée.", false);
             rafraichirTout();
         } catch (CineTrackException | SQLException e) {
             afficherMessage(e.getMessage(), true);
         }
     }
-
-    // --- Actions Films ---
 
     @FXML
     private void onAjouterFilm() {
@@ -423,10 +384,10 @@ public class ProgrammationControleur {
                     note,
                     txtFilmSynopsis.getText()
             );
-            afficherMessage("Film ajouté au catalogue !", false);
+            afficherMessage("Film ajouté.", false);
             rafraichirTout();
         } catch (NumberFormatException e) {
-            afficherMessage("La durée (entier) et la note (décimal 0-10) doivent être numériques.", true);
+            afficherMessage("Durée ou note invalide.", true);
         } catch (CineTrackException | SQLException e) {
             afficherMessage(e.getMessage(), true);
         }
@@ -436,7 +397,7 @@ public class ProgrammationControleur {
     private void onModifierFilm() {
         Film sel = tableFilms.getSelectionModel().getSelectedItem();
         if (sel == null) {
-            afficherMessage("Sélectionnez un film dans le tableau pour le modifier.", true);
+            afficherMessage("Sélectionnez un film à modifier.", true);
             return;
         }
         try {
@@ -450,7 +411,7 @@ public class ProgrammationControleur {
                     note,
                     txtFilmSynopsis.getText()
             );
-            afficherMessage("Film #" + sel.getIdFilm() + " mis à jour !", false);
+            afficherMessage("Film mis à jour.", false);
             rafraichirTout();
         } catch (NumberFormatException e) {
             afficherMessage("Durée ou note invalide.", true);
@@ -467,8 +428,8 @@ public class ProgrammationControleur {
             return;
         }
         try {
-            programmationService.supprimerFilm(sel.getIdFilm(), authentificationService.getUtilisateurConnecte());
-            afficherMessage("Film '" + sel.getTitre() + "' supprimé (journalisé dans logs_securite).", false);
+            programmationService.supprimerFilm(sel.getIdFilm(), authService.getUtilisateurConnecte());
+            afficherMessage("Film supprimé.", false);
             rafraichirTout();
         } catch (CineTrackException | SQLException e) {
             afficherMessage(e.getMessage(), true);
@@ -486,17 +447,15 @@ public class ProgrammationControleur {
         }
     }
 
-    // --- Actions Salles ---
-
     @FXML
     private void onAjouterSalle() {
         try {
             int cap = Integer.parseInt(txtSalleCapacite.getText().trim());
             programmationService.ajouterSalle(txtSalleNom.getText(), cap, txtSalleEquipement.getText());
-            afficherMessage("Salle ajoutée avec succès !", false);
+            afficherMessage("Salle ajoutée.", false);
             rafraichirTout();
         } catch (NumberFormatException e) {
-            afficherMessage("La capacité de la salle doit être un nombre entier.", true);
+            afficherMessage("Capacité invalide.", true);
         } catch (CineTrackException | SQLException e) {
             afficherMessage(e.getMessage(), true);
         }
@@ -512,7 +471,7 @@ public class ProgrammationControleur {
         try {
             int cap = Integer.parseInt(txtSalleCapacite.getText().trim());
             programmationService.modifierSalle(sel.getIdSalle(), txtSalleNom.getText(), cap, txtSalleEquipement.getText());
-            afficherMessage("Salle mise à jour !", false);
+            afficherMessage("Salle mise à jour.", false);
             rafraichirTout();
         } catch (NumberFormatException e) {
             afficherMessage("Capacité invalide.", true);
@@ -529,21 +488,19 @@ public class ProgrammationControleur {
             return;
         }
         try {
-            programmationService.supprimerSalle(sel.getIdSalle(), authentificationService.getUtilisateurConnecte());
-            afficherMessage("Salle '" + sel.getNom() + "' supprimée (journalisé dans logs_securite).", false);
+            programmationService.supprimerSalle(sel.getIdSalle(), authService.getUtilisateurConnecte());
+            afficherMessage("Salle supprimée.", false);
             rafraichirTout();
         } catch (CineTrackException | SQLException e) {
             afficherMessage(e.getMessage(), true);
         }
     }
 
-    // --- Actions Tarifs ---
-
     @FXML
     private void onModifierTarif() {
         Tarif sel = tableTarifs.getSelectionModel().getSelectedItem();
         if (sel == null) {
-            afficherMessage("Sélectionnez une catégorie tarifaire dans le tableau.", true);
+            afficherMessage("Sélectionnez un tarif dans le tableau.", true);
             return;
         }
         try {
@@ -554,12 +511,12 @@ public class ProgrammationControleur {
                     prix,
                     txtTarifDescription.getText(),
                     chkTarifActif.isSelected(),
-                    authentificationService.getUtilisateurConnecte()
+                    authService.getUtilisateurConnecte()
             );
-            afficherMessage("Tarif '" + sel.getCategorie() + "' mis à jour et archivé dans les logs !", false);
+            afficherMessage("Tarif mis à jour.", false);
             rafraichirTout();
         } catch (NumberFormatException e) {
-            afficherMessage("Le prix unitaire doit être un nombre valide.", true);
+            afficherMessage("Prix invalide.", true);
         } catch (CineTrackException | SQLException e) {
             afficherMessage(e.getMessage(), true);
         }

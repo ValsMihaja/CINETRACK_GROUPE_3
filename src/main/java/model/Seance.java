@@ -45,6 +45,14 @@ public class Seance {
         return heure != null && dureeFilm > 0 ? heure.plusMinutes(dureeFilm) : heure;
     }
 
+    public String getDateTexte() {
+        return dateSeance != null ? dateSeance.toString() : "";
+    }
+
+    public String getHeureTexte() {
+        return heure != null ? heure + " - " + getHeureFin() : "";
+    }
+
     public int getPlacesOccupees() {
         return Math.max(0, capaciteSalle - placesDispo);
     }

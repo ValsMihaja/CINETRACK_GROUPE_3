@@ -1,6 +1,6 @@
-package dao.impl;
+package impl;
 
-import dao.IClientDAO;
+import dao.ClientDao;
 import database.DatabaseConnection;
 import model.Client;
 
@@ -12,10 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Implémentation JDBC/PostgreSQL de IClientDAO.
- */
-public class ClientDAOImpl implements IClientDAO {
+public class ClientDaoImpl implements ClientDao {
 
     @Override
     public List<Client> findAll() throws SQLException {

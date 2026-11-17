@@ -141,6 +141,10 @@ public class Reservation {
         return montantTotal;
     }
 
+    public String getMontantTexte() {
+        return String.format("%.2f Rs", montantTotal);
+    }
+
     public void setMontantTotal(double montantTotal) {
         this.montantTotal = montantTotal;
     }

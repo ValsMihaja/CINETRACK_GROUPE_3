@@ -57,6 +57,10 @@ public class Tarif {
         return prixUnitaire;
     }
 
+    public String getPrixTexte() {
+        return String.format("%.2f Rs", prixUnitaire);
+    }
+
     public void setPrixUnitaire(double prixUnitaire) {
         this.prixUnitaire = prixUnitaire;
     }

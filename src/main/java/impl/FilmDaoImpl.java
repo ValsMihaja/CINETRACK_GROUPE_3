@@ -1,6 +1,6 @@
-package dao.impl;
+package impl;
 
-import dao.IFilmDAO;
+import dao.FilmDao;
 import database.DatabaseConnection;
 import model.Film;
 
@@ -11,10 +11,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Implémentation JDBC/PostgreSQL de IFilmDAO.
- */
-public class FilmDAOImpl implements IFilmDAO {
+public class FilmDaoImpl implements FilmDao {
 
     @Override
     public List<Film> findAll() throws SQLException {

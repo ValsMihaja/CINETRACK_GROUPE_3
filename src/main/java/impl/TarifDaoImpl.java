@@ -1,6 +1,6 @@
-package dao.impl;
+package impl;
 
-import dao.ITarifDAO;
+import dao.TarifDao;
 import database.DatabaseConnection;
 import model.Tarif;
 
@@ -11,10 +11,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Implémentation JDBC/PostgreSQL de ITarifDAO.
- */
-public class TarifDAOImpl implements ITarifDAO {
+public class TarifDaoImpl implements TarifDao {
 
     @Override
     public List<Tarif> findAll() throws SQLException {

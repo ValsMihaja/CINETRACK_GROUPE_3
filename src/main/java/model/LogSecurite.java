@@ -1,6 +1,7 @@
 package model;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Entité Modèle représentant la table PostgreSQL 'logs_securite' (CC4 - Cybersécurité).
@@ -80,6 +81,13 @@ public class LogSecurite {
 
     public LocalDateTime getDateHeure() {
         return dateHeure;
+    }
+
+    public String getDateTexte() {
+        if (dateHeure == null) {
+            return "";
+        }
+        return dateHeure.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
     }
 
     public void setDateHeure(LocalDateTime dateHeure) {

@@ -13,7 +13,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import main.AppContext;
 import model.LogSecurite;
 import model.Utilisateur;
 import service.AuthentificationService;
@@ -24,18 +23,6 @@ import java.sql.SQLException;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
-/**
- * ====================================================================
- * COUCHE : CONTROLLER (Statistiques, Rapports, Utilisateurs & Cybersécurité CC4)
- * ====================================================================
- * RÔLE :
- * Contrôle la vue statistiques-view.fxml :
- * - Affichage des KPI (Chiffre d'affaires, billets vendus, réservations confirmées).
- * - Classement des films les plus réservés et taux d'occupation par séance.
- * - Export CSV des rapports statistiques.
- * - Administration (réservée à l'ADMIN) : création/suppression/déblocage des comptes
- *   (ADMIN, MANAGER, CAISSIER), consultation de logs_securite et sauvegarde PostgreSQL.
- */
 public class StatistiqueControleur {
 
     @FXML
@@ -47,7 +34,6 @@ public class StatistiqueControleur {
     @FXML
     private Label lblKpiReservations;
 
-    // Tableau Top Films
     @FXML
     private TableView<Map<String, Object>> tableTopFilms;
 
@@ -66,7 +52,6 @@ public class StatistiqueControleur {
     @FXML
     private TableColumn<Map<String, Object>, String> colTopCA;
 
-    // Tableau Taux d'Occupation
     @FXML
     private TableView<Map<String, Object>> tableOccupation;
 
@@ -88,7 +73,6 @@ public class StatistiqueControleur {
     @FXML
     private TableColumn<Map<String, Object>, String> colOccTaux;
 
-    // Onglet Administration & Sécurité (ADMIN)
     @FXML
     private Tab tabAdministration;
 
@@ -149,25 +133,11 @@ public class StatistiqueControleur {
     @FXML
     private Label lblMessageStats;
 
-    private final StatistiqueEtSauvegardeService statistiqueService;
-    private final AuthentificationService authentificationService;
-
-    public StatistiqueControleur(StatistiqueEtSauvegardeService statistiqueService,
-                                 AuthentificationService authentificationService) {
-        this.statistiqueService = statistiqueService;
-        this.authentificationService = authentificationService;
-    }
-
-    public StatistiqueControleur() {
-        this(
-                AppContext.getInstance().getStatistiqueService(),
-                AppContext.getInstance().getAuthentificationService()
-        );
-    }
+    private final StatistiqueEtSauvegardeService statistiqueService = new StatistiqueEtSauvegardeService();
+    private final AuthentificationService authService = new AuthentificationService();
 
     @FXML
     public void initialize() {
-        // Colonnes Top Films
         colTopTitre.setCellValueFactory(c -> new SimpleStringProperty(String.valueOf(c.getValue().get("titre"))));
         colTopGenre.setCellValueFactory(c -> new SimpleStringProperty(String.valueOf(c.getValue().get("genre"))));
         colTopNote.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().get("noteMoyenne") + " / 10"));
@@ -175,7 +145,6 @@ public class StatistiqueControleur {
         colTopCA.setCellValueFactory(c -> new SimpleStringProperty(
                 String.format("%.2f Rs", (Double) c.getValue().get("chiffreAffaires"))));
 
-        // Colonnes Taux d'occupation
         colOccDate.setCellValueFactory(c -> new SimpleStringProperty(String.valueOf(c.getValue().get("dateSeance"))));
         colOccHeure.setCellValueFactory(c -> new SimpleStringProperty(String.valueOf(c.getValue().get("heure"))));
         colOccSalle.setCellValueFactory(c -> new SimpleStringProperty(String.valueOf(c.getValue().get("salle"))));
@@ -184,7 +153,6 @@ public class StatistiqueControleur {
                 c.getValue().get("placesOccupees") + " / " + c.getValue().get("capacite")));
         colOccTaux.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().get("tauxOccupation") + " %"));
 
-        // Colonnes Utilisateurs
         cbUserRole.setItems(FXCollections.observableArrayList("CAISSIER", "MANAGER", "ADMIN"));
         cbUserRole.getSelectionModel().selectFirst();
 
@@ -194,7 +162,6 @@ public class StatistiqueControleur {
         colUserRole.setCellValueFactory(new PropertyValueFactory<>("role"));
         colUserStatut.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getStatutTexte()));
 
-        // Colonnes Logs de Sécurité (CC4)
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
         colLogId.setCellValueFactory(new PropertyValueFactory<>("idLog"));
         colLogDate.setCellValueFactory(c -> new SimpleStringProperty(
@@ -203,8 +170,7 @@ public class StatistiqueControleur {
         colLogAction.setCellValueFactory(new PropertyValueFactory<>("action"));
         colLogDetails.setCellValueFactory(new PropertyValueFactory<>("donneesConcernees"));
 
-        // Restriction de l'onglet Administration & Logs aux seuls Administrateurs
-        Utilisateur u = authentificationService.getUtilisateurConnecte();
+        Utilisateur u = authService.getUtilisateurConnecte();
         if (tabAdministration != null) {
             tabAdministration.setDisable(u == null || !u.estAdmin());
         }
@@ -222,10 +188,10 @@ public class StatistiqueControleur {
             tableTopFilms.setItems(FXCollections.observableArrayList(statistiqueService.obtenirTopFilms()));
             tableOccupation.setItems(FXCollections.observableArrayList(statistiqueService.obtenirTauxOccupationSeances()));
 
-            tableUtilisateurs.setItems(FXCollections.observableArrayList(authentificationService.listerUtilisateurs()));
+            tableUtilisateurs.setItems(FXCollections.observableArrayList(authService.listerUtilisateurs()));
             tableLogs.setItems(FXCollections.observableArrayList(statistiqueService.consulterLogsSecurite()));
         } catch (SQLException e) {
-            afficherMessage("Erreur lors du chargement des statistiques : " + e.getMessage(), true);
+            afficherMessage("Erreur chargement : " + e.getMessage(), true);
         }
     }
 
@@ -234,17 +200,17 @@ public class StatistiqueControleur {
         try {
             File fichier = new File("exports/rapport_exploitation_cinetrack.csv");
             statistiqueService.exporterCSV(fichier.getAbsolutePath());
-            afficherMessage("Rapport CSV exporté avec succès : " + fichier.getAbsolutePath(), false);
+            afficherMessage("Rapport exporté : " + fichier.getName(), false);
             rafraichirStatistiques();
         } catch (Exception e) {
-            afficherMessage("Erreur lors de l'export CSV : " + e.getMessage(), true);
+            afficherMessage("Erreur export CSV : " + e.getMessage(), true);
         }
     }
 
     @FXML
     private void onCreerUtilisateur() {
         try {
-            authentificationService.ajouterUtilisateur(
+            authService.ajouterUtilisateur(
                     txtUserLogin.getText(),
                     txtUserMdp.getText(),
                     txtUserNom.getText(),
@@ -255,7 +221,7 @@ public class StatistiqueControleur {
             txtUserMdp.clear();
             txtUserNom.clear();
             txtUserPrenom.clear();
-            afficherMessage("Compte utilisateur créé (mot de passe haché) !", false);
+            afficherMessage("Utilisateur créé.", false);
             rafraichirStatistiques();
         } catch (CineTrackException | SQLException e) {
             afficherMessage(e.getMessage(), true);
@@ -266,12 +232,12 @@ public class StatistiqueControleur {
     private void onDebloquerUtilisateur() {
         Utilisateur sel = tableUtilisateurs.getSelectionModel().getSelectedItem();
         if (sel == null) {
-            afficherMessage("Sélectionnez un utilisateur dans le tableau pour débloquer son compte.", true);
+            afficherMessage("Sélectionnez un utilisateur.", true);
             return;
         }
         try {
-            authentificationService.debloquerUtilisateur(sel.getIdUtilisateur());
-            afficherMessage("Compte '" + sel.getLogin() + "' débloqué et compteur remis à 0.", false);
+            authService.debloquerUtilisateur(sel.getIdUtilisateur());
+            afficherMessage("Compte '" + sel.getLogin() + "' débloqué.", false);
             rafraichirStatistiques();
         } catch (CineTrackException | SQLException e) {
             afficherMessage(e.getMessage(), true);
@@ -282,12 +248,12 @@ public class StatistiqueControleur {
     private void onSupprimerUtilisateur() {
         Utilisateur sel = tableUtilisateurs.getSelectionModel().getSelectedItem();
         if (sel == null) {
-            afficherMessage("Sélectionnez un utilisateur à supprimer.", true);
+            afficherMessage("Sélectionnez un utilisateur.", true);
             return;
         }
         try {
-            authentificationService.supprimerUtilisateur(sel.getIdUtilisateur());
-            afficherMessage("Utilisateur '" + sel.getLogin() + "' supprimé.", false);
+            authService.supprimerUtilisateur(sel.getIdUtilisateur());
+            afficherMessage("Utilisateur supprimé.", false);
             rafraichirStatistiques();
         } catch (CineTrackException | SQLException e) {
             afficherMessage(e.getMessage(), true);
@@ -300,11 +266,11 @@ public class StatistiqueControleur {
             File dossier = new File("backups");
             boolean ok = statistiqueService.executerSauvegardeBDD(dossier.getAbsolutePath());
             if (ok) {
-                afficherMessage("Sauvegarde PostgreSQL générée dans : " + dossier.getAbsolutePath(), false);
+                afficherMessage("Sauvegarde générée dans : " + dossier.getName(), false);
                 rafraichirStatistiques();
             }
         } catch (Exception e) {
-            afficherMessage("Erreur lors de la sauvegarde : " + e.getMessage(), true);
+            afficherMessage("Erreur sauvegarde : " + e.getMessage(), true);
         }
     }
 

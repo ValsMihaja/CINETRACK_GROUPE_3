@@ -1,6 +1,6 @@
-package dao.impl;
+package impl;
 
-import dao.ISeanceDAO;
+import dao.SeanceDao;
 import database.DatabaseConnection;
 import model.Seance;
 
@@ -15,10 +15,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Implémentation JDBC/PostgreSQL de ISeanceDAO.
- */
-public class SeanceDAOImpl implements ISeanceDAO {
+public class SeanceDaoImpl implements SeanceDao {
 
     private static final String SELECT_BASE =
             "SELECT sc.id_seance, sc.id_film, f.titre AS titre_film, f.duree AS duree_film, "

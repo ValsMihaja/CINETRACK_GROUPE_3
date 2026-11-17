@@ -7,22 +7,12 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import main.AppContext;
 import main.Main;
 import model.Utilisateur;
 import service.AuthentificationService;
 
 import java.sql.SQLException;
 
-/**
- * ====================================================================
- * COUCHE : CONTROLLER (Authentification & Contrôle d'Accès)
- * ====================================================================
- * RÔLE :
- * Gère l'écran de connexion (login-view.fxml), délègue la vérification
- * au service AuthentificationService injecté et redirige vers le tableau
- * de bord selon le rôle (CAISSIER, MANAGER, ADMIN).
- */
 public class AuthentificationControleur {
 
     @FXML
@@ -37,29 +27,15 @@ public class AuthentificationControleur {
     @FXML
     private Label lblEtatBdd;
 
-    private final AuthentificationService authentificationService;
-
-    /**
-     * Constructeur avec injection de dépendances.
-     */
-    public AuthentificationControleur(AuthentificationService authentificationService) {
-        this.authentificationService = authentificationService;
-    }
-
-    /**
-     * Constructeur par défaut requis si instancié directement par FXMLLoader.
-     */
-    public AuthentificationControleur() {
-        this(AppContext.getInstance().getAuthentificationService());
-    }
+    private final AuthentificationService authService = new AuthentificationService();
 
     @FXML
     public void initialize() {
         boolean bddOk = DatabaseConnection.testConnection();
         if (lblEtatBdd != null) {
             lblEtatBdd.setText(bddOk
-                    ? "● PostgreSQL connecté (projetcinetrackv2)"
-                    : "● PostgreSQL hors ligne — vérifiez le service sur localhost:5432");
+                    ? "Base PostgreSQL connectée"
+                    : "Base PostgreSQL hors ligne (localhost:5432)");
             lblEtatBdd.getStyleClass().removeAll("badge-success", "badge-danger");
             lblEtatBdd.getStyleClass().add(bddOk ? "badge-success" : "badge-danger");
         }
@@ -71,40 +47,15 @@ public class AuthentificationControleur {
         String mdp = txtMotDePasse.getText();
 
         try {
-            Utilisateur u = authentificationService.authentifier(login, mdp);
-            AppContext.getInstance().getStatistiqueService().setOperateurCourant(u);
-            afficherMessage("Connexion réussie. Bienvenue " + u.getNomComplet() + " !", false);
+            Utilisateur u = authService.authentifier(login, mdp);
+            afficherMessage("Bienvenue " + u.getNomComplet(), false);
             Main.afficherTableauDeBord();
-
-        } catch (CompteBloqueException e) {
-            afficherMessage("🔒 " + e.getMessage(), true);
+        } catch (CompteBloqueException | AuthentificationException e) {
+            afficherMessage(e.getMessage(), true);
             txtMotDePasse.clear();
-
-        } catch (AuthentificationException e) {
-            afficherMessage("⚠ " + e.getMessage(), true);
-            txtMotDePasse.clear();
-
         } catch (SQLException e) {
-            afficherMessage("Erreur PostgreSQL : " + e.getMessage(), true);
+            afficherMessage("Erreur base de données : " + e.getMessage(), true);
         }
-    }
-
-    @FXML
-    private void onDemoCaissier() {
-        txtLogin.setText("caissier1");
-        txtMotDePasse.setText("caissier123");
-    }
-
-    @FXML
-    private void onDemoManager() {
-        txtLogin.setText("manager1");
-        txtMotDePasse.setText("manager123");
-    }
-
-    @FXML
-    private void onDemoAdmin() {
-        txtLogin.setText("admin");
-        txtMotDePasse.setText("admin123");
     }
 
     private void afficherMessage(String texte, boolean erreur) {

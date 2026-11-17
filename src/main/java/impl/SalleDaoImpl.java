@@ -1,6 +1,6 @@
-package dao.impl;
+package impl;
 
-import dao.ISalleDAO;
+import dao.SalleDao;
 import database.DatabaseConnection;
 import model.Salle;
 
@@ -11,10 +11,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Implémentation JDBC/PostgreSQL de ISalleDAO.
- */
-public class SalleDAOImpl implements ISalleDAO {
+public class SalleDaoImpl implements SalleDao {
 
     @Override
     public List<Salle> findAll() throws SQLException {

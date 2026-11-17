@@ -13,7 +13,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import main.AppContext;
 import model.Client;
 import model.Reservation;
 import model.Seance;
@@ -23,19 +22,7 @@ import service.BilletterieService;
 import service.ProgrammationService;
 
 import java.sql.SQLException;
-import java.time.format.DateTimeFormatter;
 
-/**
- * ====================================================================
- * COUCHE : CONTROLLER (Billetterie, Réservations, Tarifs & Clients)
- * ====================================================================
- * RÔLE :
- * Contrôle la vue billetterie-view.fxml :
- * - Sélection d'une séance, d'un client et d'un tarif avec calcul automatique du montant.
- * - Réservation de places et génération du billet unique récapitulatif.
- * - Annulation d'une réservation avec remise à jour des places disponibles.
- * - Création et recherche de fiches clients.
- */
 public class BilletterieControleur {
 
     @FXML
@@ -86,7 +73,6 @@ public class BilletterieControleur {
     @FXML
     private TableColumn<Reservation, String> colStatutRes;
 
-    // Formulaire Fiche Client
     @FXML
     private TextField txtClientNom;
 
@@ -120,31 +106,14 @@ public class BilletterieControleur {
     @FXML
     private TableColumn<Client, String> colTelClient;
 
-    private final BilletterieService billetterieService;
-    private final ProgrammationService programmationService;
-    private final AuthentificationService authentificationService;
-
-    public BilletterieControleur(BilletterieService billetterieService,
-                                 ProgrammationService programmationService,
-                                 AuthentificationService authentificationService) {
-        this.billetterieService = billetterieService;
-        this.programmationService = programmationService;
-        this.authentificationService = authentificationService;
-    }
-
-    public BilletterieControleur() {
-        this(
-                AppContext.getInstance().getBilletterieService(),
-                AppContext.getInstance().getProgrammationService(),
-                AppContext.getInstance().getAuthentificationService()
-        );
-    }
+    private final BilletterieService billetterieService = new BilletterieService();
+    private final ProgrammationService programmationService = new ProgrammationService();
+    private final AuthentificationService authService = new AuthentificationService();
 
     @FXML
     public void initialize() {
         spNbPlaces.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 20, 1));
 
-        // Colonnes Réservations
         colNumBillet.setCellValueFactory(new PropertyValueFactory<>("numeroBillet"));
         colSeanceRes.setCellValueFactory(new PropertyValueFactory<>("infoSeance"));
         colClientRes.setCellValueFactory(new PropertyValueFactory<>("nomCompletClient"));
@@ -154,14 +123,12 @@ public class BilletterieControleur {
                 new SimpleStringProperty(String.format("%.2f Rs", cell.getValue().getMontantTotal())));
         colStatutRes.setCellValueFactory(new PropertyValueFactory<>("statut"));
 
-        // Colonnes Clients
         colIdClient.setCellValueFactory(new PropertyValueFactory<>("idClient"));
         colNomClient.setCellValueFactory(new PropertyValueFactory<>("nom"));
         colPrenomClient.setCellValueFactory(new PropertyValueFactory<>("prenom"));
         colEmailClient.setCellValueFactory(new PropertyValueFactory<>("email"));
         colTelClient.setCellValueFactory(new PropertyValueFactory<>("telephone"));
 
-        // Écouteurs pour le calcul automatique du tarif et l'affichage des places restantes
         cbSeance.valueProperty().addListener((obs, oldV, newV) -> mettreAJourDevis());
         cbTarif.valueProperty().addListener((obs, oldV, newV) -> mettreAJourDevis());
         spNbPlaces.valueProperty().addListener((obs, oldV, newV) -> mettreAJourDevis());
@@ -196,14 +163,14 @@ public class BilletterieControleur {
             tableClients.setItems(FXCollections.observableArrayList(billetterieService.listerClients()));
             mettreAJourDevis();
         } catch (SQLException e) {
-            afficherMessage("Erreur lors du chargement des données : " + e.getMessage(), true);
+            afficherMessage("Erreur chargement : " + e.getMessage(), true);
         }
     }
 
     private void mettreAJourDevis() {
         Seance s = cbSeance.getValue();
         if (s != null) {
-            lblPlacesRestantes.setText(s.getPlacesDispo() + " / " + s.getCapaciteSalle() + " places disponibles");
+            lblPlacesRestantes.setText(s.getPlacesDispo() + " / " + s.getCapaciteSalle() + " places");
         } else {
             lblPlacesRestantes.setText("--");
         }
@@ -240,17 +207,16 @@ public class BilletterieControleur {
                     client.getIdClient(),
                     tarif.getIdTarif(),
                     nbPlaces,
-                    authentificationService.getUtilisateurConnecte()
+                    authService.getUtilisateurConnecte()
             );
 
             txtBilletGenere.setText(billet.genererRecapitulatifBillet());
-            afficherMessage("Réservation confirmée ! Billet généré : " + billet.getNumeroBillet(), false);
+            afficherMessage("Réservation confirmée : " + billet.getNumeroBillet(), false);
             rafraichirDonnees();
-
         } catch (CineTrackException e) {
             afficherMessage(e.getMessage(), true);
         } catch (SQLException e) {
-            afficherMessage("Erreur SQL lors de la réservation : " + e.getMessage(), true);
+            afficherMessage("Erreur SQL : " + e.getMessage(), true);
         }
     }
 
@@ -258,24 +224,21 @@ public class BilletterieControleur {
     private void onAnnulerReservation() {
         Reservation selection = tableReservations.getSelectionModel().getSelectedItem();
         if (selection == null) {
-            afficherMessage("Veuillez sélectionner une réservation dans le tableau pour l'annuler.", true);
+            afficherMessage("Sélectionnez une réservation dans le tableau.", true);
             return;
         }
 
         try {
             billetterieService.annulerReservation(
                     selection.getIdReservation(),
-                    authentificationService.getUtilisateurConnecte()
+                    authService.getUtilisateurConnecte()
             );
-            afficherMessage(
-                    "Billet " + selection.getNumeroBillet() + " annulé. Les places ont été remises en disponibilité.",
-                    false
-            );
+            afficherMessage("Billet " + selection.getNumeroBillet() + " annulé.", false);
             rafraichirDonnees();
         } catch (CineTrackException e) {
             afficherMessage(e.getMessage(), true);
         } catch (SQLException e) {
-            afficherMessage("Erreur SQL lors de l'annulation : " + e.getMessage(), true);
+            afficherMessage("Erreur SQL : " + e.getMessage(), true);
         }
     }
 
@@ -292,12 +255,12 @@ public class BilletterieControleur {
             txtClientPrenom.clear();
             txtClientEmail.clear();
             txtClientTelephone.clear();
-            afficherMessage("Fiche client créée avec succès !", false);
+            afficherMessage("Client enregistré.", false);
             rafraichirDonnees();
         } catch (CineTrackException e) {
             afficherMessage(e.getMessage(), true);
         } catch (SQLException e) {
-            afficherMessage("Erreur SQL (vérifiez que l'email n'est pas déjà utilisé) : " + e.getMessage(), true);
+            afficherMessage("Erreur SQL : " + e.getMessage(), true);
         }
     }
 
@@ -307,7 +270,7 @@ public class BilletterieControleur {
             String motCle = txtRechercheClient.getText();
             tableClients.setItems(FXCollections.observableArrayList(billetterieService.rechercherClients(motCle)));
         } catch (SQLException e) {
-            afficherMessage("Erreur lors de la recherche client : " + e.getMessage(), true);
+            afficherMessage("Erreur recherche : " + e.getMessage(), true);
         }
     }
 

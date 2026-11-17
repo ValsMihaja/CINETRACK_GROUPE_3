@@ -2,36 +2,32 @@ package main;
 
 import database.DatabaseConnection;
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import model.Utilisateur;
+import service.AuthentificationService;
 
 import java.net.URL;
 
-/**
- * ====================================================================
- * CLASSE PRINCIPALE : Point d'entrée de l'application JavaFX CineTrack V2
- * ====================================================================
- * Architecture :
- * View (FXML + CSS) -> Controller -> Service -> DAO Interface -> DAO Impl JDBC -> PostgreSQL
- */
 public class Main extends Application {
 
     private static Stage primaryStage;
 
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage stage) {
         primaryStage = stage;
         afficherEcranConnexion();
     }
 
     public static void afficherEcranConnexion() {
         try {
-            Parent root = AppContext.getInstance().chargerVue("/view/login-view.fxml");
-            Scene scene = new Scene(root, 960, 620);
+            Parent root = FXMLLoader.load(Main.class.getResource("/view/login-view.fxml"));
+            Scene scene = new Scene(root, 900, 560);
             appliquerFeuilleDeStyle(scene);
 
-            primaryStage.setTitle("CineTrack V2 — Cinéma Le Lumière (Authentification)");
+            primaryStage.setTitle("CineTrack - Connexion");
             primaryStage.setScene(scene);
             primaryStage.centerOnScreen();
             primaryStage.show();
@@ -42,14 +38,13 @@ public class Main extends Application {
 
     public static void afficherTableauDeBord() {
         try {
-            Parent root = AppContext.getInstance().chargerVue("/view/dashboard-view.fxml");
-            Scene scene = new Scene(root, 1280, 780);
+            Parent root = FXMLLoader.load(Main.class.getResource("/view/dashboard-view.fxml"));
+            Scene scene = new Scene(root, 1220, 760);
             appliquerFeuilleDeStyle(scene);
 
-            String role = AppContext.getInstance().getAuthentificationService().getUtilisateurConnecte() != null
-                    ? AppContext.getInstance().getAuthentificationService().getUtilisateurConnecte().getRole()
-                    : "";
-            primaryStage.setTitle("CineTrack V2 — Cinéma Le Lumière | Backoffice [" + role + "]");
+            Utilisateur u = new AuthentificationService().getUtilisateurConnecte();
+            String role = u != null ? u.getRole() : "";
+            primaryStage.setTitle("CineTrack - Gestion Cinéma (" + role + ")");
             primaryStage.setScene(scene);
             primaryStage.centerOnScreen();
             primaryStage.show();
@@ -66,10 +61,7 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) {
-        System.out.println("====================================================");
-        System.out.println(" Démarrage de CineTrack V2 - Cinéma Le Lumière");
-        System.out.println(" Connexion PostgreSQL : " + (DatabaseConnection.testConnection() ? "OK" : "ÉCHEC"));
-        System.out.println("====================================================");
+        System.out.println("Connexion PostgreSQL : " + (DatabaseConnection.testConnection() ? "OK" : "ECHEC"));
         launch(args);
     }
 }

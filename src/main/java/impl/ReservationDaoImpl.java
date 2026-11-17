@@ -1,6 +1,6 @@
-package dao.impl;
+package impl;
 
-import dao.IReservationDAO;
+import dao.ReservationDao;
 import database.DatabaseConnection;
 import model.Reservation;
 
@@ -15,11 +15,7 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Implémentation JDBC/PostgreSQL de IReservationDAO.
- * Appelle les procédures stockées PostgreSQL sp_creer_reservation et sp_annuler_reservation.
- */
-public class ReservationDAOImpl implements IReservationDAO {
+public class ReservationDaoImpl implements ReservationDao {
 
     private static final String SELECT_BASE =
             "SELECT r.id_reservation, r.numero_billet, r.id_seance, "
