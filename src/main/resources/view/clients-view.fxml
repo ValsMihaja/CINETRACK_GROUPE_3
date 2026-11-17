@@ -4,33 +4,20 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
 <VBox xmlns="http://javafx.com/javafx/21"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="controller.ClientControleur"
-      spacing="14">
+      spacing="12">
 
-    <Label text="Clients" styleClass="page-title"/>
-    <Label fx:id="lblMessage" text="" wrapText="true"/>
-
-    <VBox spacing="10" styleClass="card">
-        <Label text="Nouveau client" styleClass="section-title"/>
-        <HBox spacing="10">
-            <TextField fx:id="txtNom" promptText="Nom" HBox.hgrow="ALWAYS"/>
-            <TextField fx:id="txtPrenom" promptText="Prénom" HBox.hgrow="ALWAYS"/>
-            <TextField fx:id="txtEmail" promptText="Email" HBox.hgrow="ALWAYS"/>
-            <TextField fx:id="txtTelephone" promptText="Téléphone" HBox.hgrow="ALWAYS"/>
-            <Button text="Ajouter" onAction="#onAjouter" styleClass="btn-primary"/>
-        </HBox>
-    </VBox>
-
-    <HBox spacing="10" alignment="CENTER_LEFT">
-        <TextField fx:id="txtRecherche" promptText="Rechercher un client" prefWidth="300"/>
-        <Button text="Rechercher" onAction="#onRechercher" styleClass="btn-secondary"/>
+    <HBox alignment="CENTER_LEFT" spacing="12">
+        <Label text="Clients" styleClass="page-title" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+        <Button text="Actualiser" onAction="#rafraichirTable" styleClass="btn-secondary"/>
     </HBox>
+
+    <Label fx:id="lblMessage" text="" styleClass="msg-error"/>
 
     <TableView fx:id="tableClients" VBox.vgrow="ALWAYS">
         <columns>

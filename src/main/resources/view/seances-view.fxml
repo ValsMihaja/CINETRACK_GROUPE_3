@@ -1,43 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
 <VBox xmlns="http://javafx.com/javafx/21"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="controller.SeanceControleur"
-      spacing="14">
+      spacing="12">
 
-    <Label text="Séances" styleClass="page-title"/>
-    <Label fx:id="lblMessage" text="" wrapText="true"/>
-
-    <VBox spacing="10" styleClass="card">
-        <Label text="Programmer une séance" styleClass="section-title"/>
-        <HBox spacing="10" alignment="CENTER_LEFT">
-            <ComboBox fx:id="cbFilm" promptText="Film" prefWidth="220"/>
-            <ComboBox fx:id="cbSalle" promptText="Salle" prefWidth="160"/>
-            <DatePicker fx:id="dpDate" prefWidth="140"/>
-            <TextField fx:id="txtHeure" promptText="HH:mm" prefWidth="90"/>
-            <Button fx:id="btnProgrammer" text="Programmer" onAction="#onProgrammer" styleClass="btn-primary"/>
-            <Button fx:id="btnSupprimer" text="Supprimer" onAction="#onSupprimer" styleClass="btn-danger"/>
-        </HBox>
-    </VBox>
-
-    <HBox spacing="10" alignment="CENTER_LEFT">
-        <Label text="Filtres :" styleClass="field-label"/>
-        <DatePicker fx:id="dpFiltreDate" promptText="Date" prefWidth="135"/>
-        <ComboBox fx:id="cbFiltreSalle" promptText="Salle" prefWidth="150"/>
-        <ComboBox fx:id="cbFiltreFilm" promptText="Film" prefWidth="200"/>
-        <Button text="Filtrer" onAction="#onFiltrer" styleClass="btn-secondary"/>
-        <Button text="Tout afficher" onAction="#onReinitialiserFiltres" styleClass="btn-secondary"/>
+    <HBox alignment="CENTER_LEFT" spacing="12">
+        <Label text="Séances" styleClass="page-title" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+        <Button text="Actualiser" onAction="#rafraichirTable" styleClass="btn-secondary"/>
     </HBox>
+
+    <Label fx:id="lblMessage" text="" styleClass="msg-error"/>
 
     <TableView fx:id="tableSeances" VBox.vgrow="ALWAYS">
         <columns>

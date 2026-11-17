@@ -10,12 +10,11 @@
 
 - **Protection du code existant :** Ne **jamais** réécrire, supprimer ou refactoriser les fichiers et contrôleurs existants listés dans la section **« 3. CODE VERROUILLÉ (DÉJÀ IMPLÉMENTÉ) »**, sauf si l'utilisateur te donne une autorisation explicite sur un fichier précis.
 - **Architecture MVC stricte :** Respecter impérativement l'architecture en couches du projet (JavaFX, Maven, PostgreSQL) et la séparation des packages :
-  - `controller` : uniquement la logique UI JavaFX (`@FXML`), aucun SQL ni règle métier complexe ;
-  - `service` : règles métier et validations, **zéro import JavaFX**, **zéro SQL direct**, utilisation des interfaces `dao` / implémentations `impl` ;
-  - `dao` / `impl` : interfaces `*Dao` dans `dao/` (sans préfixe `I`, sans `IDAO<T>`) et implémentations JDBC PostgreSQL `*DaoImpl` dans le package externe `impl/` par requêtes préparées (`PreparedStatement` / `CallableStatement`) ;
+  - `controller` : uniquement la logique UI JavaFX (`@FXML`), récupération/affichage des données ;
+  - `service` : couche métier recevant l'interface DAO par injection de dépendances dans le constructeur ;
+  - `dao` / `impl` : interfaces `*Dao` dans `dao/` et implémentations JDBC PostgreSQL `*DaoImpl` dans le package externe `impl/` par requêtes préparées (`PreparedStatement`) ;
   - `model` : entités métier POJO alignées sur les 8 tables PostgreSQL ;
-  - `database` : gestionnaire de connexion JDBC centralisé ;
-  - `exceptions` : hiérarchie d'exceptions métier héritant de `CineTrackException`.
+  - `database` : gestionnaire de connexion JDBC centralisé (`DatabaseConnection`).
 - **Base de données & Identifiants protégés :** Ne **jamais** modifier les identifiants de connexion dans `DatabaseConnection.java` ni les scripts SQL déjà validés (`sql/*.sql`) sans demande explicite de l'utilisateur.
 - **Lancement & Tests :** Utiliser `mvn javafx:run` (ou `mvn clean javafx:run`) pour exécuter l'application JavaFX et `mvn test` pour exécuter les tests unitaires JUnit 5 (ne pas lancer `main.Main` directement sans `--module-path`).
 
@@ -33,85 +32,65 @@
 
 ## 3. CODE VERROUILLÉ (DÉJÀ IMPLÉMENTÉ)
 
-### 3.1 Configuration, Documentation & Point d'entrée (`racine`, `main/`, `database/`, `exceptions/`)
+### 3.1 Configuration, Documentation & Point d'entrée (`racine`, `main/`, `database/`)
 | Élément | Rôle actuel |
 | :--- | :--- |
 | `pom.xml` | Configuration Maven Java 21 : dépendances `javafx-controls` et `javafx-fxml` (`21.0.2`), driver `postgresql` (`42.7.3`), `junit-jupiter` (`5.10.2`), plugins `maven-compiler-plugin` (`3.13.0`) et `javafx-maven-plugin` (`0.0.8`, `mainClass=main.Main`). |
-| `README.md` | Documentation d'architecture MVC en couches, structure des dossiers, comptes de test (`caissier1`, `manager1`, `admin`) et commandes de lancement (`mvn clean javafx:run`, `mvn test`). |
+| `README.md` | Documentation d'architecture MVC Étape 2 et commandes de lancement (`mvn clean javafx:run`, `mvn test`). |
 | `docs/Conception_Etape1_CineTrackV2.md` | Dossier de conception Étape 1 (récapitulatif des diagrammes UML, MLD 8 tables, scripts SQL et jeu de données). |
-| `src/main/java/main/Main.java` | Point d'entrée JavaFX (`Application`) : teste la connexion PostgreSQL au démarrage, charge `login-view.fxml` et `dashboard-view.fxml` via `FXMLLoader.load(...)`, applique `/css/style.css` et gère les transitions de scènes. |
-| `src/main/java/main/TestArchitectureMVC.java` | Classe utilitaire CLI de validation de bout en bout (connexion PostgreSQL `cinetrack_groupe3`, authentification des 3 rôles, lecture des 8 tables, calcul tarifaire, conflit horaire et disponibilité des places). |
-| `src/main/java/database/DatabaseConnection.java` | Gestionnaire utilitaire centralisé JDBC PostgreSQL (`jdbc:postgresql://localhost:5432/cinetrack_groupe3`) avec `getConnection()` et `testConnection()`. |
-| `src/main/java/exceptions/CineTrackException.java` | Exception métier racine portant un `codeErreur`. |
-| `src/main/java/exceptions/AuthentificationException.java` | Levée lors d'identifiants invalides (`ERR_AUTHENTIFICATION`). |
-| `src/main/java/exceptions/CompteBloqueException.java` | Levée lorsqu'un compte est verrouillé après 3 échecs (`ERR_COMPTE_BLOQUE`). |
-| `src/main/java/exceptions/ConflitHoraireException.java` | Levée lorsqu'une séance chevauche une autre séance dans la même salle (`ERR_CONFLIT_HORAIRE`). |
-| `src/main/java/exceptions/PlaceIndisponibleException.java` | Levée quand le nombre de places demandées dépasse `places_dispo` (`ERR_PLACES_INDISPONIBLES`). |
+| `src/main/java/main/Main.java` | Point d'entrée JavaFX (`Application`) : charge `main-view.fxml` et applique `/css/style.css`. |
+| `src/main/java/database/DatabaseConnection.java` | Gestionnaire centralisé JDBC PostgreSQL (`jdbc:postgresql://localhost:5432/cinetrack_groupe3`) avec `getConnection()` et `testConnection()`. |
 
 ### 3.2 Couche Controller (`src/main/java/controller/`)
 | Contrôleur | Vue associée & Rôle actuel |
 | :--- | :--- |
-| `AuthentificationControleur.java` | Contrôle `login-view.fxml` : récupère login/mot de passe, appelle `AuthentificationService` et ouvre le tableau de bord (sans badge de connexion BDD ni identifiants de test). |
-| `DashboardControleur.java` | Contrôle `dashboard-view.fxml` : gère le menu latéral par rôle et la déconnexion. |
-| `BilletterieControleur.java` | Contrôle `billetterie-view.fxml` : réservations, annulations et aperçu du billet. |
-| `ClientControleur.java` | Contrôle `clients-view.fxml` : ajout, recherche et liste des clients. |
-| `SeanceControleur.java` | Contrôle `seances-view.fxml` : programmation, filtrage et suppression des séances. |
-| `FilmControleur.java` | Contrôle `films-view.fxml` : ajout, modification, suppression et recherche des films. |
-| `SalleControleur.java` | Contrôle `salles-view.fxml` : ajout, modification et suppression des salles. |
-| `TarifControleur.java` | Contrôle `tarifs-view.fxml` : consultation et modification des tarifs. |
-| `StatistiqueControleur.java` | Contrôle `statistiques-view.fxml` : KPI, Top Films, occupation par séance et export CSV. |
-| `AdministrationControleur.java` | Contrôle `administration-view.fxml` : gestion des utilisateurs, logs de sécurité et sauvegarde BDD. |
+| `MainControleur.java` | Contrôle `main-view.fxml` : navigation entre les vues (`films`, `salles`, `seances`, `clients`, `tarifs`). |
+| `FilmControleur.java` | Contrôle `films-view.fxml` : affiche la liste des films via `FilmService`. |
+| `SalleControleur.java` | Contrôle `salles-view.fxml` : affiche la liste des salles via `SalleService`. |
+| `SeanceControleur.java` | Contrôle `seances-view.fxml` : affiche la liste des séances via `SeanceService`. |
+| `ClientControleur.java` | Contrôle `clients-view.fxml` : affiche la liste des clients via `ClientService`. |
+| `TarifControleur.java` | Contrôle `tarifs-view.fxml` : affiche la grille tarifaire via `TarifService`. |
 
 ### 3.3 Couche Service (`src/main/java/service/`)
-| Service / Interface | Rôle actuel |
+| Service | Rôle actuel |
 | :--- | :--- |
-| `ExportService.java` | Contrat de service pour l'export CSV (`exporterCSV`) et la sauvegarde BDD (`executerSauvegardeBDD`). |
-| `AuthentificationService.java` | Authentification des 3 rôles (`ADMIN`, `MANAGER`, `CAISSIER`), session utilisateur partagée (`utilisateurConnecte`), blocage automatique après 3 tentatives échouées, hachage SHA-256 formaté `$2a$12$`, gestion des comptes et journalisation dans `logs_securite`. |
-| `BilletterieService.java` | Calcul automatique du montant total (`calculerMontantTotal`), contrôle de disponibilité des places et réservation via procédure stockée `sp_creer_reservation`, annulation via `sp_annuler_reservation`, gestion/recherche des clients et modification des tarifs (réservée `MANAGER`/`ADMIN`). |
-| `ProgrammationService.java` | CRUD et recherche sur les Films et les Salles avec validations métier et contrôle de droits (`estManagerOuPlus()`) sur les suppressions ; programmation/modification/suppression de Séances avec détection des conflits horaires applicative (`verifierConflitHoraire`) et interception du trigger SQL `trg_verif_conflit_seance`. |
-| `StatistiqueEtSauvegardeService.java` | Implémente `ExportService` : agrégations d'exploitation (CA, billets, réservations, Top Films, occupation, CA par période), consultation de `logs_securite`, génération d'export CSV avec BOM UTF-8 et sauvegarde PostgreSQL (`cinetrack_groupe3`) via `pg_dump.exe`. |
+| `FilmService.java` | Reçoit `FilmDao` par constructeur (défaut `FilmDaoImpl`) et expose `listerFilms()`. |
+| `SalleService.java` | Reçoit `SalleDao` par constructeur (défaut `SalleDaoImpl`) et expose `listerSalles()`. |
+| `SeanceService.java` | Reçoit `SeanceDao` par constructeur (défaut `SeanceDaoImpl`) et expose `listerSeances()`. |
+| `ClientService.java` | Reçoit `ClientDao` par constructeur (défaut `ClientDaoImpl`) et expose `listerClients()`. |
+| `TarifService.java` | Reçoit `TarifDao` par constructeur (défaut `TarifDaoImpl`) et expose `listerTarifs()`. |
 
 ### 3.4 Couche Modèle (`src/main/java/model/`)
 | Modèle | Table PostgreSQL & Rôle actuel |
 | :--- | :--- |
-| `Utilisateur.java` | Table `utilisateurs` : identifiants, rôle (`ADMIN`, `MANAGER`, `CAISSIER`), `tentativesEchouees`, `actif`, `dateDerniereConnexion`, helpers `estAdmin()`, `estManagerOuPlus()`, `estCompteVerrouille()`, `getStatutTexte()`. |
-| `Film.java` | Table `films` : `idFilm`, `titre`, `genre`, `duree` (minutes), `note`, `synopsis`. |
-| `Salle.java` | Table `salles` : `idSalle`, `nom`, `capacite`, `equipement`. |
-| `Seance.java` | Table `seances` (enrichie par jointure film/salle) : créneau `dateSeance`/`heure`, `placesDispo`, helpers `getHeureFin()`, `getPlacesOccupees()`, `getTauxOccupation()`. |
-| `Client.java` | Table `clients` : `idClient`, `nom`, `prenom`, `email`, `telephone`, `dateInscription`, `getNomComplet()`. |
-| `Tarif.java` | Table `tarifs` : `categorie` (`PLEIN_TARIF`, `TARIF_REDUIT`, `TARIF_ETUDIANT`, `ABONNEMENT`), `libelle`, `prixUnitaire`, `description`, `actif`, et `calculerMontant(nbPlaces)`. |
-| `Reservation.java` | Table `reservations` : `numeroBillet`, références séance/client/tarif/utilisateur, `nbPlaces`, `montantTotal`, `dateReservation`, `statut` (`CONFIRMEE`/`ANNULEE`), et `genererRecapitulatifBillet()`. |
-| `LogSecurite.java` | Table `logs_securite` (CC4) : `idLog`, `idUtilisateur`, `utilisateurLogin`, `action`, `tableConcernee`, `donneesConcernees`, `dateHeure`, `getDateTexte()`. |
-| `StatFilm.java` | Modèle d'affichage des statistiques par film (`titre`, `genre`, `noteTexte`, `placesVendues`, `chiffreAffairesTexte`). |
-| `StatOccupation.java` | Modèle d'affichage du taux d'occupation par séance (`dateSeance`, `heure`, `salle`, `film`, `occupationTexte`, `tauxTexte`). |
+| `Utilisateur.java` | Entité POJO table `utilisateurs`. |
+| `Film.java` | Entité POJO table `films`. |
+| `Salle.java` | Entité POJO table `salles`. |
+| `Seance.java` | Entité POJO table `seances`. |
+| `Client.java` | Entité POJO table `clients`. |
+| `Tarif.java` | Entité POJO table `tarifs`. |
+| `Reservation.java` | Entité POJO table `reservations`. |
+| `LogSecurite.java` | Entité POJO table `logs_securite`. |
 
 ### 3.5 Couche DAO (`src/main/java/dao/` & `src/main/java/impl/`)
 | Interface DAO (`dao/`) | Implémentation JDBC (`impl/`) | Rôle actuel |
 | :--- | :--- | :--- |
-| `UtilisateurDao` | `UtilisateurDaoImpl` | CRUD `utilisateurs`, recherche par login, incrément/réinitialisation des tentatives échouées et déblocage de compte. |
-| `FilmDao` | `FilmDaoImpl` | CRUD `films`, recherche multicritères (`titre`, `genre`) et liste des genres distincts. |
-| `SalleDao` | `SalleDaoImpl` | CRUD `salles` et recherche par nom (`findByNom`). |
-| `SeanceDao` | `SeanceDaoImpl` | CRUD `seances` avec jointures `films`/`salles`, recherche par critères (`date`, `idSalle`, `idFilm`) et vérification SQL des chevauchements horaires (`verifierConflitHoraire`). |
-| `ClientDao` | `ClientDaoImpl` | CRUD `clients` et recherche par mot-clé (`rechercher`). |
-| `TarifDao` | `TarifDaoImpl` | CRUD `tarifs`, filtrage des tarifs actifs (`findActifs`) et recherche par catégorie (`findByCategorie`). |
-| `ReservationDao` | `ReservationDaoImpl` | Lecture/CRUD `reservations`, recherche par `numeroBillet` et appels aux procédures stockées PostgreSQL `sp_creer_reservation` et `sp_annuler_reservation` via `CallableStatement`. |
-| `LogSecuriteDao` | `LogSecuriteDaoImpl` | Insertion et lecture de `logs_securite` (CC4). |
-| `StatistiqueDao` | `StatistiqueDaoImpl` | Requêtes statistiques d'exploitation (CA total, billets, réservations confirmées, Top Films, taux d'occupation). |
+| `FilmDao` | `FilmDaoImpl` | Lecture JDBC `findAll()` sur `films`. |
+| `SalleDao` | `SalleDaoImpl` | Lecture JDBC `findAll()` sur `salles`. |
+| `SeanceDao` | `SeanceDaoImpl` | Lecture JDBC `findAll()` sur `seances` avec jointures `films` et `salles`. |
+| `ClientDao` | `ClientDaoImpl` | Lecture JDBC `findAll()` sur `clients`. |
+| `TarifDao` | `TarifDaoImpl` | Lecture JDBC `findAll()` sur `tarifs`. |
 
 ### 3.6 Ressources Vues FXML & CSS (`src/main/resources/`)
 | Fichier | Rôle actuel |
 | :--- | :--- |
-| `view/login-view.fxml` | Écran de connexion minimaliste (sans badge BDD ni comptes de test). |
-| `view/dashboard-view.fxml` | Menu latéral et conteneur central. |
-| `view/billetterie-view.fxml` | Vue réservations et aperçu du billet. |
-| `view/clients-view.fxml` | Vue ajout et recherche de clients. |
-| `view/seances-view.fxml` | Vue programmation et filtrage des séances. |
-| `view/films-view.fxml` | Vue gestion du catalogue des films. |
-| `view/salles-view.fxml` | Vue gestion des salles. |
-| `view/tarifs-view.fxml` | Vue gestion des tarifs. |
-| `view/statistiques-view.fxml` | Vue KPI, Top Films, taux d'occupation et export CSV. |
-| `view/administration-view.fxml` | Vue gestion des utilisateurs, logs de sécurité et sauvegarde BDD. |
-| `css/style.css` | Feuille de style minimaliste professionnelle. |
+| `view/main-view.fxml` | Fenêtre principale avec menu latéral et conteneur central. |
+| `view/films-view.fxml` | Vue d'affichage des films. |
+| `view/salles-view.fxml` | Vue d'affichage des salles. |
+| `view/seances-view.fxml` | Vue d'affichage des séances. |
+| `view/clients-view.fxml` | Vue d'affichage des clients. |
+| `view/tarifs-view.fxml` | Vue d'affichage des tarifs. |
+| `css/style.css` | Feuille de style minimaliste. |
 
 ### 3.7 Base de Données SQL (`sql/`) & Tests (`src/test/`)
 | Fichier | Rôle actuel |
@@ -119,13 +98,21 @@
 | `sql/v2_create_tables.sql` | Script DDL PostgreSQL créant les 8 tables métier (`utilisateurs`, `salles`, `films`, `seances`, `clients`, `tarifs`, `reservations`, `logs_securite`) et les index associés. |
 | `sql/v2_triggers_procedures.sql` | Déclencheurs (`trg_verif_conflit_seance`, `trg_maj_places_reservation`, `trg_historique_tarifs`, `trg_log_suppression_film`, `trg_log_suppression_salle`) et procédures stockées (`sp_creer_reservation`, `sp_annuler_reservation`, `sp_enregistrer_tentative_connexion`). |
 | `sql/v2_insert_data.sql` | Jeu de données de test initial (utilisateurs, salles, films, séances, clients, tarifs, réservations, logs). |
-| `sql/v2_requetes_statistiques.sql` | Requêtes SQL d'exploitation et de statistiques (films les plus réservés, taux d'occupation, CA jour/mois, audit sécurité). |
+| `sql/v2_requetes_statistiques.sql` | Requêtes SQL d'exploitation et de statistiques. |
 | `sql/v2_script_complet_pgadmin.sql` | Script tout-en-un consolidé pour exécution directe dans pgAdmin 4. |
-| `src/test/java/service/CineTrackArchitectureTest.java` | Suite de tests JUnit 5 validant le calcul automatique de tarif, la détection de conflit horaire, le contrôle de disponibilité des places et l'authentification des 3 rôles. |
+| `src/test/java/service/CineTrackArchitectureTest.java` | Tests JUnit 5 validant la connexion PostgreSQL (`cinetrack_groupe3`), l'injection de dépendances par constructeur et la lecture MVC via les 5 services. |
 
 ---
 
 ## 4. JOURNAL DES MODIFICATIONS DE L'ÉQUIPE
+
+- **2026-11-17 — Recentrage strict sur l'Étape 2 uniquement (Interface JavaFX + Architecture MVC + Injection + PostgreSQL) :**
+  - **Fichiers créés / modifiés / supprimés :**
+    - Suppression des fonctionnalités des étapes ultérieures (CRUDs Étapes 3-5, Authentification/Cybersécurité Étape 6, Statistiques/Exports Étape 7, `exceptions/`, `TestArchitectureMVC.java`) pour ne garder que le périmètre de l'Étape 2.
+    - Mise en place d'une base MVC simple et lisible : `main-view.fxml` (`MainControleur`) + 5 vues de consultation (`films-view.fxml`, `salles-view.fxml`, `seances-view.fxml`, `clients-view.fxml`, `tarifs-view.fxml`) avec leurs contrôleurs dédiés (`*Controleur`), services avec injection de dépendance par constructeur (`*Service(XxxDao)`), interfaces `dao/*Dao.java` et implémentations JDBC `impl/*DaoImpl.java` (`findAll()`) connectées à `cinetrack_groupe3`.
+    - Mise à jour de `CineTrackArchitectureTest.java`, `README.md` et `style.css`.
+  - **Vérification :** `mvn clean test` (tests Étape 2 exécutés sur `cinetrack_groupe3`).
+  - **Points d'attention :** les CRUDs, validations/exceptions, billetterie, authentification et statistiques seront ajoutés progressivement lors des Étapes 3 à 7.
 
 - **2026-11-17 — Découpage clair 1 contrôleur / 1 vue par écran & suppression du badge BDD sur le login :**
   - **Fichiers créés / modifiés :**

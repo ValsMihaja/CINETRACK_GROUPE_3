@@ -1,33 +1,33 @@
 # CineTrack V2 — Cinéma Le Lumière (BTS SIO SLAM)
 
-Application desktop JavaFX de gestion cinématographique développée selon l'architecture MVC avec PostgreSQL (JDBC).
+Application desktop JavaFX développée selon l'architecture MVC avec injection de dépendances par constructeur et connexion PostgreSQL (`cinetrack_groupe3`).
 
-## 1. Architecture MVC
+## 1. Architecture MVC (Étape 2)
 
 ```
 View (src/main/resources/view/*.fxml + style.css)
    ↓
-Controller (1 contrôleur simple par écran)
+Controller (controller.*Controleur)
    ↓
-Service (service.*Service)
+Service (service.*Service — injection DAO par constructeur)
    ↓
 DAO Interface (dao.*Dao)
    ↓
 DAO Impl JDBC (impl.*DaoImpl)
    ↓
-DatabaseConnection -> PostgreSQL (cinetrack_groupe3 — 8 tables)
+DatabaseConnection -> PostgreSQL (cinetrack_groupe3)
 ```
 
 ## 2. Structure du projet
 
-- `src/main/java/main/` : `Main.java`, `TestArchitectureMVC.java`
-- `src/main/java/database/` : `DatabaseConnection.java`
-- `src/main/java/model/` : `Utilisateur`, `Film`, `Salle`, `Seance`, `Client`, `Tarif`, `Reservation`, `LogSecurite`, `StatFilm`, `StatOccupation`
-- `src/main/java/dao/` : `ClientDao`, `FilmDao`, `SalleDao`, `SeanceDao`, `TarifDao`, `ReservationDao`, `UtilisateurDao`, `LogSecuriteDao`, `StatistiqueDao`
-- `src/main/java/impl/` : implémentations JDBC (`*DaoImpl`)
-- `src/main/java/service/` : `AuthentificationService`, `BilletterieService`, `ProgrammationService`, `StatistiqueEtSauvegardeService`, `ExportService`
-- `src/main/java/controller/` : `AuthentificationControleur`, `DashboardControleur`, `BilletterieControleur`, `ClientControleur`, `SeanceControleur`, `FilmControleur`, `SalleControleur`, `TarifControleur`, `StatistiqueControleur`, `AdministrationControleur`
-- `src/main/resources/view/` : `login-view.fxml`, `dashboard-view.fxml`, `billetterie-view.fxml`, `clients-view.fxml`, `seances-view.fxml`, `films-view.fxml`, `salles-view.fxml`, `tarifs-view.fxml`, `statistiques-view.fxml`, `administration-view.fxml`
+- `src/main/java/main/Main.java` : point d'entrée JavaFX
+- `src/main/java/database/DatabaseConnection.java` : connexion PostgreSQL (`cinetrack_groupe3`)
+- `src/main/java/model/` : entités POJO (`Film`, `Salle`, `Seance`, `Client`, `Tarif`, `Reservation`, `Utilisateur`, `LogSecurite`)
+- `src/main/java/dao/` : interfaces `FilmDao`, `SalleDao`, `SeanceDao`, `ClientDao`, `TarifDao`
+- `src/main/java/impl/` : implémentations JDBC (`FilmDaoImpl`, `SalleDaoImpl`, `SeanceDaoImpl`, `ClientDaoImpl`, `TarifDaoImpl`)
+- `src/main/java/service/` : `FilmService`, `SalleService`, `SeanceService`, `ClientService`, `TarifService`
+- `src/main/java/controller/` : `MainControleur`, `FilmControleur`, `SalleControleur`, `SeanceControleur`, `ClientControleur`, `TarifControleur`
+- `src/main/resources/view/` : `main-view.fxml`, `films-view.fxml`, `salles-view.fxml`, `seances-view.fxml`, `clients-view.fxml`, `tarifs-view.fxml`
 - `src/main/resources/css/style.css` : feuille de style CSS
 - `src/test/java/service/CineTrackArchitectureTest.java` : tests JUnit 5
 
@@ -37,7 +37,7 @@ DatabaseConnection -> PostgreSQL (cinetrack_groupe3 — 8 tables)
 mvn clean javafx:run
 ```
 
-Tests unitaires :
+Tests :
 
 ```bash
 mvn test
