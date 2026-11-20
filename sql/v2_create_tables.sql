@@ -15,9 +15,6 @@ DROP TABLE IF EXISTS films CASCADE;
 DROP TABLE IF EXISTS salles CASCADE;
 DROP TABLE IF EXISTS utilisateurs CASCADE;
 
--- =============================================================================
--- 1. TABLE UTILISATEURS (Personnel interne : Administrateur, Manager, Caissier)
--- =============================================================================
 CREATE TABLE utilisateurs (
     id_utilisateur          SERIAL PRIMARY KEY,
     login                   VARCHAR(50)  NOT NULL UNIQUE,
@@ -30,9 +27,6 @@ CREATE TABLE utilisateurs (
     date_derniere_connexion TIMESTAMP
 );
 
--- =============================================================================
--- 2. TABLE SALLES (Salles de projection et capacités)
--- =============================================================================
 CREATE TABLE salles (
     id_salle   SERIAL PRIMARY KEY,
     nom        VARCHAR(50)  NOT NULL UNIQUE,
@@ -40,9 +34,6 @@ CREATE TABLE salles (
     equipement VARCHAR(100)
 );
 
--- =============================================================================
--- 3. TABLE FILMS (Catalogue des films)
--- =============================================================================
 CREATE TABLE films (
     id_film  SERIAL PRIMARY KEY,
     titre    VARCHAR(100) NOT NULL,
@@ -52,9 +43,6 @@ CREATE TABLE films (
     synopsis TEXT
 );
 
--- =============================================================================
--- 4. TABLE SEANCES (Programmation des films dans les salles)
--- =============================================================================
 CREATE TABLE seances (
     id_seance    SERIAL PRIMARY KEY,
     id_film      INT  NOT NULL REFERENCES films(id_film) ON DELETE CASCADE,
@@ -65,9 +53,6 @@ CREATE TABLE seances (
     UNIQUE (id_salle, date_seance, heure)
 );
 
--- =============================================================================
--- 5. TABLE CLIENTS (Fiches clients gérées au guichet par le Caissier)
--- =============================================================================
 CREATE TABLE clients (
     id_client        SERIAL PRIMARY KEY,
     nom              VARCHAR(80)  NOT NULL,
@@ -77,9 +62,6 @@ CREATE TABLE clients (
     date_inscription DATE         NOT NULL DEFAULT CURRENT_DATE
 );
 
--- =============================================================================
--- 6. TABLE TARIFS (Catégories tarifaires : Plein tarif, Réduit, Étudiant, Abonnement)
--- =============================================================================
 CREATE TABLE tarifs (
     id_tarif      SERIAL PRIMARY KEY,
     categorie     VARCHAR(30)   NOT NULL UNIQUE CHECK (categorie IN ('PLEIN_TARIF', 'TARIF_REDUIT', 'TARIF_ETUDIANT', 'ABONNEMENT')),
@@ -89,9 +71,6 @@ CREATE TABLE tarifs (
     actif         BOOLEAN       NOT NULL DEFAULT TRUE
 );
 
--- =============================================================================
--- 7. TABLE RESERVATIONS (Billetterie, réservations et billets uniques)
--- =============================================================================
 CREATE TABLE reservations (
     id_reservation   SERIAL PRIMARY KEY,
     numero_billet    VARCHAR(30)  NOT NULL UNIQUE,
@@ -105,9 +84,6 @@ CREATE TABLE reservations (
     statut           VARCHAR(20)  NOT NULL DEFAULT 'CONFIRMEE' CHECK (statut IN ('CONFIRMEE', 'ANNULEE'))
 );
 
--- =============================================================================
--- 8. TABLE LOGS_SECURITE (CC4 - Journalisation des actions sensibles)
--- =============================================================================
 CREATE TABLE logs_securite (
     id_log             SERIAL PRIMARY KEY,
     id_utilisateur     INT          REFERENCES utilisateurs(id_utilisateur) ON DELETE SET NULL,
